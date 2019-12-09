@@ -31,4 +31,23 @@ class CreditProvider {
     }
   }
 
+  Future<Responser> cancel(int id) async {
+    try {
+      Response res = await _http.put('/credit/cancel', data: {"id": id});
+      return Responser.fromJson(res.data);
+    } catch (e) {
+      return Responser.fromJson(processError(e));
+    }
+  }
+
+  Future<dynamic> list({int page: 1, int ruta}) async {
+    Response res = await _http.get("/credit?page=$page" + (ruta != null? "&ruta=$ruta" : ""));
+    return Responser.fromJson(res.data);
+  }
+
+  // Obtener un crédito por el id
+  Future<dynamic> getById(int id) async {
+    Response res = await _http.get('/credit/$id');
+    return Responser.fromJson(res.data);
+  }
 }

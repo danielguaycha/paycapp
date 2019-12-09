@@ -11,7 +11,7 @@
 lib/env.dart
 env.dart
 run.bat
-
+local.sh
 # IntelliJ related
 *.iml
 *.ipr

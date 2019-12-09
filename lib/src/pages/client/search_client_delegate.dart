@@ -147,7 +147,7 @@ class SearchClientDelegate extends SearchDelegate<Person> {
         },
       );
     else
-      return ListTile();
+      return Center();
   }
 
 

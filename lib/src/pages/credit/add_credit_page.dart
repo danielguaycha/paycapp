@@ -10,17 +10,17 @@ import 'package:paycapp/src/models/ruta_model.dart';
 import 'package:paycapp/src/pages/client/search_client_delegate.dart';
 import 'package:paycapp/src/pages/routes/route_selection_page.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
-import 'package:paycapp/src/utils/messages_util.dart' show notify;
+import 'package:paycapp/src/utils/messages_util.dart' show customSnack;
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart' show listItems, isNumeric, listItemsNormal;
 import 'package:paycapp/src/config.dart' show plazos, utilidad, cobros, defaultUtility;
 
-class AddLoanPage extends StatefulWidget {  
+class AddCreditPage extends StatefulWidget {
   @override
-  _AddLoanPageState createState() => _AddLoanPageState();
+  _AddCreditPageState createState() => _AddCreditPageState();
 }
 
-class _AddLoanPageState extends State<AddLoanPage> {
+class _AddCreditPageState extends State<AddCreditPage> {
 
   Person _client;
   Credit _credit;
@@ -28,6 +28,8 @@ class _AddLoanPageState extends State<AddLoanPage> {
   ProgressLoader _loader;
 
   final _frmKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   TextEditingController _userField = TextEditingController();
   TextEditingController _routeField = TextEditingController();
   TextEditingController _addressFieldController = TextEditingController();
@@ -50,6 +52,7 @@ class _AddLoanPageState extends State<AddLoanPage> {
   Widget build(BuildContext context) {
     _loader = new ProgressLoader(context);
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.grey[100],
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
@@ -64,9 +67,9 @@ class _AddLoanPageState extends State<AddLoanPage> {
             )
          ],
        ),
-      body: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: 35),
-           child: _form(context),                     
+      body:  SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 35),
+             child: _form(context),
       ),
       bottomNavigationBar: new BottomAppBar(
         shape: CircularNotchedRectangle(),
@@ -111,14 +114,15 @@ class _AddLoanPageState extends State<AddLoanPage> {
     Responser res = await CreditProvider().store(_credit);
     if(res.ok) {
       _clearCredit(context);
-      notify(context, "Crédito procesado con éxito");
+      _scaffoldKey.currentState.showSnackBar(customSnack("Crédito procesao con exito"));
+
     } else {
-      notify(context, res.message, type: 'err');
+      _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
     }
     _loader.hide();
   }
 
-  void _clearCredit(context) {
+  _clearCredit(context) {
     _credit = new Credit();
     _client = null;
     _enabled = false;
@@ -568,7 +572,7 @@ class _AddLoanPageState extends State<AddLoanPage> {
   // Buscar clientes
   searchClient(context) async{
     _client = await showSearch(context: context, delegate: SearchClientDelegate());
-    if(_client == null && _client.id != null) return;
+    if(_client == null) return;
 
     _credit.utilidad = defaultUtility;
     _credit.personId = _client.id;

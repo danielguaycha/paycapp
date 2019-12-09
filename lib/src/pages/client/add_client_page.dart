@@ -3,7 +3,7 @@ import 'package:paycapp/src/models/person_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/providers/client_provider.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
-import 'package:paycapp/src/utils/messages_util.dart' show notify, errMessage;
+import 'package:paycapp/src/utils/messages_util.dart' show errMessage;
 import 'package:paycapp/src/utils/progress_loader.dart';
 
 

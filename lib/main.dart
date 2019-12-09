@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
         primaryColor: colors['primary'],
         accentColor: Colors.orange,
         fontFamily: 'Montserrat',
-        cursorColor: Colors.blue[900],
+        cursorColor: Colors.orange[900],
         selectedRowColor: colors['accent'],
         primarySwatch: Colors.orange,        
         textTheme: TextTheme(

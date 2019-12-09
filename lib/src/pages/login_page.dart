@@ -72,14 +72,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: SingleChildScrollView(
           child: Container(
             margin: EdgeInsets.only(top: 20),
             padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
@@ -91,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                   _pwInput(),
                   SizedBox(height: 30.0),
                   _btnLogin(context)
+
                 ],
               ),
             ),
@@ -101,12 +101,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _btnLogin(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
-      child: MaterialButton(
+    return MaterialButton(
         disabledColor: Colors.black12,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(1),
         ),
         onPressed: _loader
             ? null
@@ -122,8 +120,7 @@ class _LoginPageState extends State<LoginPage> {
             loader: _loader,
             loaderText: "Iniciando...",
             text: "Iniciar Sesión"),
-      ),
-    );
+      );
   }
 
   void _submitLogin(BuildContext context) async {

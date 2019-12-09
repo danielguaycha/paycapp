@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:paycapp/env.dart' show server;
 
 const appName = "PayApp";
-const urlApi = "http://${server}/api";
-
+const urlApi = "http://$server/api";
+const debug = true;
 const colors = {
     'primary': Color(0xFF1C2230),
     'accent': Color(0xFFFF9900),

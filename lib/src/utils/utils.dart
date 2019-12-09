@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:paycapp/src/config.dart' show urlApi;
+import 'package:paycapp/src/config.dart' show debug;
 
 // Loader Component
 Widget loader({String text = 'Cargando...'}) {
@@ -49,10 +50,12 @@ List<DropdownMenuItem<dynamic>> listItemsNormal(List<dynamic> map, String concat
 Map<String, dynamic> processError(error){
   if(error is DioError){
     DioError e = error;
+    if(debug) {
+      debugPrint(e.message);
+    }
     if(e.response != null && e.response.data != null) {
       String msg = '';
-
-      if(e.response.data['message'] != null)
+      if(e.response.data['message'] != null && e.response.data['errors'] == null)
         msg = e.response.data['message'];
       else if(e.response.data['error'] != null)
         msg = e.response.data['error'];
@@ -88,6 +91,11 @@ Map<String, dynamic> processError(error){
 Widget renderError(error, Function callback) {  
   if(error is DioError) {
     DioError e = error;
+
+    if(debug) {
+      debugPrint(e.message);
+    }
+
     if(e.response != null && e.response.data != null) {      
       final msg = e.response.data['error'];          
       return Center(        
@@ -110,8 +118,13 @@ Widget renderError(error, Function callback) {
           msg: "El servidor no responde, contacte con soporte", icon: FontAwesomeIcons.question);
       }
       return Center(child: Text("Error desconocido con el servidor, contacte con soporte!"));
-    } 
+    }
+
+
   } else {
+    if(debug) {
+      debugPrint(error.toString());
+    }
     return Center(child: Text("Error desconocido, contacte con soporte!"));
   }  
 }

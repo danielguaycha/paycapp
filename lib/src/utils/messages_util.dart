@@ -55,7 +55,7 @@ Widget textOrLoader({bool loader: false, String loaderText: 'Procesando...', Str
   return Text(text, style: TextStyle(color: Colors.white));
 }
 
-notify(BuildContext context, String message, {String type: 'ok'}) {
+Widget customSnack(String message, {String type: 'ok'}) {
   SnackBar snack;
   switch(type.toLowerCase()){
     case 'ok':
@@ -70,5 +70,5 @@ notify(BuildContext context, String message, {String type: 'ok'}) {
       snack = SnackBar(content: Text(message));
       break;
   }
-  Scaffold.of(context).showSnackBar(snack);
+  return snack;
 }
