@@ -3,8 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:paycapp/src/models/credit_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/pages/credit/show_credit_page.dart';
+import 'package:paycapp/src/pages/payments/list_payments_page.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
@@ -39,7 +41,9 @@ class _ListCreditPageState extends State<ListCreditPage> {
 
   _creditList() {
     return FutureBuilder(
+      //lista del servidor
       future: CreditProvider().list(),
+      
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return renderError(snapshot.error, _retry);
@@ -58,10 +62,11 @@ class _ListCreditPageState extends State<ListCreditPage> {
           itemCount: results.length,
           itemBuilder: (BuildContext context, int index) {
             var credit = (results[index]);
+            //Credit credito = (results[index]);
             return Slidable(
                 actionPane: SlidableDrawerActionPane(),
                 actionExtentRatio: 0.20,
-                child: ListTile(
+                child: ListTile(                  
                   dense: true,
                   leading: Icon(FontAwesomeIcons.moneyBillAlt,
                       size: 25, color: Theme.of(context).accentColor),
@@ -76,10 +81,9 @@ class _ListCreditPageState extends State<ListCreditPage> {
                   subtitle: Text(
                       "Plazo: ${credit['plazo']} | Total: \$${double.parse(credit['total']).toStringAsFixed(2)}"),
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ShowCreditPage(id: credit['id'])));
+                    //Credit _credit = (new Credit()) credit;
+                    //Navigator.pushNamed(context, 'showcredit', arguments: _credit);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ListPaymentsPage(id: credit['id'])) );
                   },
                 ),
                 actions: <Widget>[                 
