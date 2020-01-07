@@ -77,9 +77,6 @@ class _MapPageState extends State<MapPage> {
                        infoWindow: InfoWindow(title: 'Cliente', snippet: 'Casa de $name')
                   ),
                 );
-                //polyLines: appState.polyLines;
-                //_polyLines.add(appState.polyLines);
-              //print(snapshot.data.latitude);
               return _map();
             }
           }      

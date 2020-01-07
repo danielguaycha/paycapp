@@ -16,6 +16,7 @@ class _ShowCreditPageState extends State<ShowCreditPage> {
   bool _visible = false;
   double _width = 50.0;
   double _height = 50.0;
+
   @override
   Widget build(BuildContext context) {
   final Credit credito = ModalRoute.of(context).settings.arguments;
