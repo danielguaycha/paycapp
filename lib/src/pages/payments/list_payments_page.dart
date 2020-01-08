@@ -1,6 +1,7 @@
 import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
@@ -15,6 +16,10 @@ class ListPaymentsPage extends StatefulWidget {
   @override
   _ListPaymentsPageState createState() => _ListPaymentsPageState();
 }
+
+// Codigo extra
+Icon iconoPanel = new Icon(Icons.arrow_upward);
+// Fin codigo extra
 
 class _ListPaymentsPageState extends State<ListPaymentsPage> {
   ProgressLoader _loader;
@@ -54,56 +59,63 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   Widget _bodyPayments(results) {
     return SlidingUpPanel(
       body: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    _labelClient(
-                        contenido: "${results['name']} ${results['surname']}"
-                            .toUpperCase()),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: _mediumCircle(
-                              value: "\$ ${results['monto']}",
-                              etiqueta: "Prestamo"),
-                        ),
-                        Expanded(
-                          child: _bigCircle(
-                              value: "\$ ${results['total']}",
-                              etiqueta: "Total a pagar"),
-                        ),
-                        Expanded(
-                          child: _mediumCircle(
-                              value: "${results['utilidad']} %",
-                              etiqueta: "Interés"),
-                        ),
-                      ],
-                    ),
-                    Center(
-                      child: _labelDetail(
-                          description:
-                              "${results['description']}"), //pagos: 7, value: 20.0, plazo: "SEMANAL"),
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: _labelInformation(
-                              contenido: "${results['total_pagado']}",
-                              etiqueta: "Total pagado"),
-                        ),
-                        _line(),
-                        Expanded(
-                          child: _labelInformation(
-                              contenido: "${results['n_pagos']}",
-                              etiqueta: "Pagos"),
-                        ),
-                      ],
-                    ),
-                  ],
+        child: Column(
+          children: <Widget>[
+            _labelClient(
+                contenido:
+                    "${results['name']} ${results['surname']}".toUpperCase()),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: _mediumCircle(
+                      value: "\$ ${results['monto']}", etiqueta: "Prestamo"),
                 ),
-              ),
-            
-            panel: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results),
-            
+                Expanded(
+                  child: _bigCircle(
+                      value: "\$ ${results['total']}",
+                      etiqueta: "Total a pagar"),
+                ),
+                Expanded(
+                  child: _mediumCircle(
+                      value: "${results['utilidad']} %", etiqueta: "Interés"),
+                ),
+              ],
+            ),
+            Center(
+              child: _labelDetail(
+                  description:
+                      "${results['description']}"), //pagos: 7, value: 20.0, plazo: "SEMANAL"),
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: _labelInformation(
+                      contenido: "${results['total_pagado']}",
+                      etiqueta: "Total pagado"),
+                ),
+                _line(),
+                Expanded(
+                  child: _labelInformation(
+                      contenido: "${results['n_pagos']}", etiqueta: "Pagos"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      onPanelOpened: () {
+        setState(() {
+          iconoPanel = new Icon(Icons.arrow_downward);
+          print("Panel Arriba");
+        });
+      },
+      onPanelClosed: () {
+        setState(() {
+          iconoPanel = new Icon(Icons.arrow_upward);
+          print("Panel Abajo");
+        });
+      },
+      panel: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results),
     );
   }
 
@@ -244,14 +256,21 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
         child: Column(
       children: <Widget>[
         Row(children: <Widget>[
-          
-          Text(
-            "\t $etiqueta",
-            //textAlign: TextAlign.center,
-
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold,
-            backgroundColor: Colors.orange),
-          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(2.0),
+              height: 25.0,
+              child: iconoPanel,
+              //Text(
+              //  "\t ${Icons.arrow_drop_up}",
+              //  textAlign: TextAlign.center,
+              //  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              //),
+              decoration: BoxDecoration(
+                color: Colors.orange[300],
+              ),
+            ),
+          )
         ]),
         Expanded(
           child: ListView.builder(
@@ -260,6 +279,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               itemBuilder: (context, index) {
                 var payment = results['payments'][index];
                 return _tarjeta(
+                    id_pago: "${payment['id']}",
                     date: "${payment['date']}",
                     value: "${payment['total']}",
                     state: "${payment['status']}");
@@ -269,15 +289,15 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     ));
   }
 
-  Slidable _tarjeta({String date, String value, String state}) {
-    Color _color = Colors.green;
-    String _state = "Pagado";
-    if (state == "1") {
-      _color = Colors.grey;
-      _state = "Pendiente";
-    } else if (state == "2") {
+  Slidable _tarjeta({String id_pago, String date, String value, String state}) {
+    Color _color = Colors.grey;
+    String _state = "Pendiente";
+    if (state == "-1") {
       _color = Colors.red;
       _state = "En mora";
+    } else if (state == "2") {
+      _color = Colors.green;
+      _state = "Pagado";
     }
 
     return Slidable(
@@ -325,23 +345,32 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             color: Colors.blue,
             icon: Icons.payment,
             onTap: () async {
-              bool process = await _updatePayment(widget.id, context);
-              //if(process){
+              // 2 sginfica que esta pagado
+              bool process = await _updatePayment(int.parse(id_pago) , 2, context, title: "Realizar pago", content: "¿Está seguro de realizar este pago?");
+              if(process){
+                print("Se pago");
+                setState(() {
+                  
+                });
               //  results.removeAt(index);
               //  setState(() {});
-              //}
-            },
+              }            },
           ),
           IconSlideAction(
             caption: 'Marcar \ncomo mora',
             color: Colors.red,
             icon: Icons.remove_circle_outline,
             onTap: () async {
-              bool process = await _updateToMora(-1, context);
-              //if(process){
+              // -1 sginfica que estara en mora
+              bool process = await _updatePayment(int.parse(id_pago) , -1, context, title: "Marcar en Mora", content: "¿Está seguro que desea marcar como mora este pago?");
+              if(process){
+                setState(() {
+                  
+                });
+                print("Se puso en mora");
               //  results.removeAt(index);
               //  setState(() {});
-              //}
+              }
             },
           ),
         ],
@@ -371,17 +400,17 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
         ]);
   }
 
-  Future<bool> _updatePayment(int status, context) async {
-    _loader.show(msg: "Marcando...");
-    //Responser res = await CreditProvider().updateToMora(status);
-    //if(res.ok) {
-    //  Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
-    // } else {
-    //   Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
-    //}
-    _loader.hide();
-    return true;
-  }
+  // Future<bool> _updatePayment(int status, context) async {
+  //   _loader.show(msg: "Marcando...");
+  //   //Responser res = await CreditProvider().updateToMora(status);
+  //   //if(res.ok) {
+  //   //  Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
+  //   // } else {
+  //   //   Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
+  //   //}
+  //   _loader.hide();
+  //   return true;
+  // }
 
   //Actualizar a mora
   Future<bool> _showDetail(int status, context) async {
@@ -406,10 +435,10 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
   //Actualizar a mora
-  Future<bool> _updateToMora(int status, context) async {
+  Future<bool> _updatePayment(int id, int status, context, {String title, String content}) async {
     int isOk = await Alert.confirm(context,
-        title: "Marcar en Mora",
-        content: "¿Está seguro que desea marcar como mora este pago?");
+        title: title,
+        content: content);
     if (isOk == 1) {
       return false;
     }
@@ -419,12 +448,14 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     //}
 
     _loader.show(msg: "Marcando...");
-    //Responser res = await CreditProvider().updateToMora(status);
-    //if(res.ok) {
-    //  Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
-    // } else {
-    //   Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
-    //}
+    Responser res = await CreditProvider().updatePayment(id, status);
+    if(res.ok) { 
+      print("Todo bien");     
+      //Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
+    } else {
+      print("ERROR: ${res.message}");     
+       //Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
+    }
     _loader.hide();
     return true;
   }

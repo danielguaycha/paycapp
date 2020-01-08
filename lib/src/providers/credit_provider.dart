@@ -50,15 +50,19 @@ class CreditProvider {
     Response res = await _http.get("/payment/$id");
     return Responser.fromJson(res.data);
   }
+
   //Supuestamente esto borra el credito
   Future<dynamic> deletePayments(id) async {
     Response res = await _http.delete("/payment/$id");
     return Responser.fromJson(res.data);
   }
+
   //Actualizar a mora
-  Future<Responser> updateToMora(int id) async {
+  Future<Responser> updatePayment(int id, int status) async {
+    // status = -1 -> mora
+    // status = 2 -> pagado    
     try {
-      Response res = await _http.put('/payment', data: {"status": id});
+      Response res = await _http.put('/payment/$id', data: {"status": status});
       return Responser.fromJson(res.data);
     } catch (e) {
       return Responser.fromJson(processError(e));
