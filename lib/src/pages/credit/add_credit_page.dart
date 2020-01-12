@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:paycapp/src/models/credit_model.dart';
 import 'package:paycapp/src/models/person_model.dart';
 import 'package:paycapp/src/models/responser.dart';
@@ -830,18 +831,23 @@ class _AddCreditPageState extends State<AddCreditPage> {
   }
 
   Future<File> compressImg(File file) async {
+
+    if(file == null) return null;
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+
     String name = basename(file.path);
     String fileName = 'compress-'+name.split('.')[0];
     String ext = name.split('.')[1];
-    String finalPath = file.parent.path+'/'+fileName+'.'+ext;
+    String finalPath = appDocPath+'/'+fileName+'.'+ext;
 
     var result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path, finalPath,
         quality: 88
-      );
-    file.deleteSync();
-    //print(file.lengthSync());
-    //print(result.lengthSync());
+      );    
+    print(file.lengthSync());
+    print(result.lengthSync());
     return result;
   }
 }

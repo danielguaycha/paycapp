@@ -14,12 +14,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 GetIt locator = GetIt.instance;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await LocalStorage().initPrefs();
   locator.registerLazySingleton(() => NavigationService());
 
   runApp(new AlertProvider(
     child: new MyApp(),
-    config: new AlertConfig(ok: "SI", cancel: "CANCELAR"),
+    config: new AlertConfig(ok: "SI", cancel: "CANCELAR", useIosStyle: false),
   ));
 }
 
