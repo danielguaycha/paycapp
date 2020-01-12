@@ -19,6 +19,7 @@ class ListPaymentsPage extends StatefulWidget {
 
 // Codigo extra
 Icon iconoPanel = new Icon(Icons.arrow_upward);
+final _scaffoldKey = GlobalKey<ScaffoldState>();
 // Fin codigo extra
 
 class _ListPaymentsPageState extends State<ListPaymentsPage> {
@@ -31,6 +32,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     _loader = new ProgressLoader(context);
 
     return Scaffold(
+      key: _scaffoldKey,
         appBar: AppBar(
           title: Text("Historial de Cobros"),
         ),
@@ -84,7 +86,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             Center(
               child: _labelDetail(
                   description:
-                      "${results['description']}"), //pagos: 7, value: 20.0, plazo: "SEMANAL"),
+                      "${results['description']}"),
             ),
             Row(
               children: <Widget>[
@@ -115,6 +117,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
           print("Panel Abajo");
         });
       },
+      panelSnapping: true,
       panel: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results),
     );
   }
@@ -198,13 +201,6 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
   Container _labelDetail({String description: ""}) {
-    //int pagos: 0, double value: 0.0, String plazo: ""}) {
-    //String cadena = "";
-    // if (_isPar(pagos)) {
-    //   cadena = "$pagos pago(s) de $value \n Plazo: $plazo";
-    // } else {
-    //   cadena = "$pagos pago(s) de $value + un pago de $value \n Plazo: $plazo";
-    // }
     return Container(
       padding: EdgeInsets.all(10.0),
       margin: EdgeInsets.all(10.0),
@@ -261,11 +257,6 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               padding: EdgeInsets.all(2.0),
               height: 25.0,
               child: iconoPanel,
-              //Text(
-              //  "\t ${Icons.arrow_drop_up}",
-              //  textAlign: TextAlign.center,
-              //  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              //),
               decoration: BoxDecoration(
                 color: Colors.orange[300],
               ),
@@ -320,7 +311,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "$date", // .day}/${date.month}/${date.year}",
+                          "$date",
                           style: TextStyle(fontSize: 20, color: _color),
                         ),
                       ],
@@ -349,12 +340,8 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               bool process = await _updatePayment(int.parse(id_pago) , 2, context, title: "Realizar pago", content: "¿Está seguro de realizar este pago?");
               if(process){
                 print("Se pago");
-                setState(() {
-                  
-                });
-              //  results.removeAt(index);
-              //  setState(() {});
-              }            },
+                setState(() {});
+              }},
           ),
           IconSlideAction(
             caption: 'Marcar \ncomo mora',
@@ -364,12 +351,8 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               // -1 sginfica que estara en mora
               bool process = await _updatePayment(int.parse(id_pago) , -1, context, title: "Marcar en Mora", content: "¿Está seguro que desea marcar como mora este pago?");
               if(process){
-                setState(() {
-                  
+                setState(() {                  
                 });
-                print("Se puso en mora");
-              //  results.removeAt(index);
-              //  setState(() {});
               }
             },
           ),
@@ -380,7 +363,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             color: Colors.black38,
             icon: Icons.delete,
             onTap: () async {
-              bool process = await _deleteCredit(widget.id, context);
+              bool process = await _deleteCredit(int.parse(id_pago), context);
               if (process) {
                 print("Se elimino el pago por: $reason");
               }
@@ -391,48 +374,15 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             color: Colors.amber,
             icon: Icons.list,
             onTap: () async {
-              bool process = await _showDetail(widget.id, context);
-              if (process) {
-                print("Detalle de: ${widget.id}");
-              }
+              // bool process = await _showDetail(widget.id, context);
+              // if (process) {
+              //   print("Detalle de: ${widget.id}");
+              // }
             },
           ),
         ]);
   }
 
-  // Future<bool> _updatePayment(int status, context) async {
-  //   _loader.show(msg: "Marcando...");
-  //   //Responser res = await CreditProvider().updateToMora(status);
-  //   //if(res.ok) {
-  //   //  Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
-  //   // } else {
-  //   //   Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
-  //   //}
-  //   _loader.hide();
-  //   return true;
-  // }
-
-  //Actualizar a mora
-  Future<bool> _showDetail(int status, context) async {
-    //int isOk = await Alert.confirm(context, title: "Marcar en Mora" ,content: "¿Está seguro que desea marcar como mora este pago?");
-    //if(isOk == 1){
-    //  return false;
-    //}
-    //if(status <= 0){
-    //  Scaffold.of(context).showSnackBar(customSnack("No se ha podido cambiar el estado de este pago", type: 'err'));
-    //  return false;
-    //}
-
-    _loader.show(msg: "Marcando...");
-    //Responser res = await CreditProvider().updateToMora(status);
-    //if(res.ok) {
-    //  Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
-    // } else {
-    //   Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
-    //}
-    _loader.hide();
-    return true;
-  }
 
   //Actualizar a mora
   Future<bool> _updatePayment(int id, int status, context, {String title, String content}) async {
@@ -442,19 +392,15 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     if (isOk == 1) {
       return false;
     }
-    //if(status <= 0){
-    //  Scaffold.of(context).showSnackBar(customSnack("No se ha podido cambiar el estado de este pago", type: 'err'));
-    //  return false;
-    //}
-
-    _loader.show(msg: "Marcando...");
+    _loader.show(msg: "Actualizando...");
     Responser res = await CreditProvider().updatePayment(id, status);
     if(res.ok) { 
-      print("Todo bien");     
-      //Scaffold.of(context).showSnackBar(customSnack("Actualizado con exito"));
+      _scaffoldKey.currentState
+          .showSnackBar(customSnack("Actualizado con exito"));
     } else {
       print("ERROR: ${res.message}");     
-       //Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
+      _scaffoldKey.currentState
+          .showSnackBar(customSnack(res.message, type: 'err'));
     }
     _loader.hide();
     return true;
@@ -469,20 +415,20 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
       return false;
     }
     if (creditId <= 0) {
-      Scaffold.of(context).showSnackBar(
-          customSnack("No se ha podido anular este pago", type: 'err'));
+      _scaffoldKey.currentState
+          .showSnackBar(customSnack("No se ha podido anular este pago", type: 'err'));
       return false;
     }
-
+    
     await _displayDialog(context);
-    // _loader.show(msg : "Anulando crédito");
-    // Responser res = await CreditProvider().cancel(creditId);
-    // if(res.ok) {
-    //   Scaffold.of(context).showSnackBar(customSnack("Crédito procesao con exito"));
-    // } else {
-    //   Scaffold.of(context).showSnackBar(customSnack(res.message, type: 'err'));
-    // }
-    // _loader.hide();
+    _loader.show(msg : "Anulando crédito");
+    Responser res = await CreditProvider().deletePayments(creditId);
+    if(res.ok) {
+      _scaffoldKey.currentState.showSnackBar(customSnack("Crédito procesao con exito"));
+    } else {
+      _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
+    }
+    _loader.hide();
     return true;
   }
 
@@ -508,6 +454,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               )
             ],
           );
-        });
+        }
+    );
   }
 }

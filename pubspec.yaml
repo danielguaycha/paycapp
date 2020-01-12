@@ -21,8 +21,9 @@ dependencies:
     sdk: flutter
   dio:
   shared_preferences:
-  get_it:
-  easy_alert:
+  get_it: 
+  #easy_alert: ^0.0.6
+  easy_alert: 
   google_maps_flutter: ^0.5.21+8
   geolocator: ^5.1.4+2
   font_awesome_flutter:

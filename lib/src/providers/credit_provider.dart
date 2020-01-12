@@ -51,10 +51,14 @@ class CreditProvider {
     return Responser.fromJson(res.data);
   }
 
-  //Supuestamente esto borra el credito
+  //Supuestamente esto borra el pago
   Future<dynamic> deletePayments(id) async {
+    try {
     Response res = await _http.delete("/payment/$id");
     return Responser.fromJson(res.data);
+    } catch (e) {
+      return Responser.fromJson(processError(e));
+    }
   }
 
   //Actualizar a mora

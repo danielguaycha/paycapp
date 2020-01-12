@@ -8,8 +8,8 @@ import 'package:paycapp/src/utils/messages_util.dart';
 double _latSelected = 0.0;
 double _longSelected = 0.0;
 bool _locationChange = false;
-
 class MapOnlyPage extends StatefulWidget {
+
   MapOnlyPage({Key key}) : super(key: key);
 
   @override
@@ -19,8 +19,7 @@ class MapOnlyPage extends StatefulWidget {
 class _MapOnlyPageState extends State<MapOnlyPage> {
   final Set<Marker> _markers = Set();
 
-  CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(-3.272077, -79.942040), zoom: 30.0);
+  CameraPosition _initialPosition = null;
   Completer<GoogleMapController> _controller = Completer();
 
   void _onMapCreated(GoogleMapController controller) {
@@ -29,9 +28,10 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
-          title: Text('Seleccionar Ubicacion'),
+          title: Text("Seleccionar Ubicacion"),
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(
@@ -58,6 +58,7 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
                 );
               } else {
                 if (!_locationChange) {
+                  print("Pinta la marca inicial");
                   //Obtener puntos iniciales
                   _latSelected = snapshot.data.latitude;
                   _longSelected = snapshot.data.longitude;
@@ -65,11 +66,11 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
                   //Crear marca inicial
                   _markers.add(
                     Marker(
-                        draggable: true,
+                        draggable: false,
                         markerId: MarkerId('Inicial'),
-                        position: new LatLng(_latSelected, _longSelected),
+                        position: new LatLng(_latSelected, _longSelected),                        
                         infoWindow: InfoWindow(
-                          title: 'Ubicacion Cliente',
+                          title: "Ubicacion del cliente",
                         )),
                   );
                 }
@@ -114,6 +115,7 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
     return await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
+ 
   void _sendLocation() async{
     LatLng coordenadas = new LatLng(_latSelected, _longSelected);
     if (_locationChange) {
@@ -131,6 +133,7 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
     }
   }
   // Alert Enviar Dialogo
+ 
   Future<bool> _sendLocationAlert(context, String title) async {
     int isOk = await Alert.confirm(context,
         title: "$title",
@@ -140,10 +143,4 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
     }
     return true;
   }
-
-  // Future<bool> _onBackPressed() async{
-  //   print("HERE");
-  //   customSnack("Seleccione un punto en el mapa y presione el icono de enviar");
-  //   return false;
-  // }
 }
