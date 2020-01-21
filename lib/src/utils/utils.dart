@@ -71,24 +71,26 @@ Map<String, dynamic> processError(error){
         msg = msg.replaceAll(", --", "");
       }
       else {
-          msg = 'Error desconocido en la respuesta, contacte a soporte';
+          msg = 'Error desconocido en la respuesta, contacte a soporte #1';
       }
       return {'ok': false, 'message':  msg };
     } else {
       if(e.type == DioErrorType.DEFAULT) {
-        return {'ok': false, 'message': "No se pudo comunicar con el servidor"};
+        print("ERROR: $error ");
+        return {'ok': false, 'message': "No se pudo comunicar con el servidor #2"};
       }
       if(e.type == DioErrorType.CONNECT_TIMEOUT) {
-        return {'ok': false, 'message': "El servidor no responde, contacte con soporte"};
+        return {'ok': false, 'message': "El servidor no responde, contacte con soporte #3"};
       }
-      return {'ok': false, 'message': "Error desconocido con el servidor, contacte con soporte!"};
+      return {'ok': false, 'message': "Error desconocido con el servidor, contacte con soporte! #4"};
     }
   }
-  return {'ok': false, 'message':  'Error desconocido, contacte con soporte'};
+  return {'ok': false, 'message':  'Error desconocido, contacte con soporte #5'};
 }
 
 // Render Errors
 Widget renderError(error, Function callback) {  
+  print(error);
   if(error is DioError) {
     DioError e = error;
 

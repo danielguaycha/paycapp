@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:paycapp/src/pages/credit/add_credit_page.dart';
-import 'package:paycapp/src/pages/credit/show_credit_page.dart';
 import 'package:paycapp/src/pages/expense/add_expense_page.dart';
 import 'package:paycapp/src/pages/home_page.dart';
 import 'package:paycapp/src/pages/login_page.dart';

@@ -105,19 +105,19 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
           ],
         ),
       ),
+
       onPanelOpened: () {
         setState(() {
           iconoPanel = new Icon(Icons.arrow_downward);
-          print("Panel Arriba");
         });
       },
       onPanelClosed: () {
         setState(() {
           iconoPanel = new Icon(Icons.arrow_upward);
-          print("Panel Abajo");
         });
       },
       panelSnapping: true,
+      parallaxEnabled: true,
       panel: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results),
     );
   }
@@ -364,9 +364,10 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             icon: Icons.delete,
             onTap: () async {
               bool process = await _deleteCredit(int.parse(id_pago), context);
-              if (process) {
-                print("Se elimino el pago por: $reason");
-              }
+              // if (process) {
+              //   print("Se elimino el pago por: $reason");
+              //   reason = "";
+              // }
             },
           ),
           IconSlideAction(
@@ -422,9 +423,9 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     
     await _displayDialog(context);
     _loader.show(msg : "Anulando crédito");
-    Responser res = await CreditProvider().deletePayments(creditId);
+    Responser res = await CreditProvider().deletePayments(creditId, reason);
     if(res.ok) {
-      _scaffoldKey.currentState.showSnackBar(customSnack("Crédito procesao con exito"));
+      _scaffoldKey.currentState.showSnackBar(customSnack("Pago anulado con exito"));
     } else {
       _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
     }
@@ -433,6 +434,8 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
   Future _displayDialog(BuildContext context) async {
+    _textEditingController.text = "";
+    reason = "";
     return showDialog(
         context: context,
         builder: (context) {
@@ -441,14 +444,14 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             content: TextField(
               controller: _textEditingController,
               decoration: InputDecoration(hintText: "Motivo"),
-              onChanged: (text) {
+              onChanged: (text) {                
                 reason = text;
               },
             ),
             actions: <Widget>[
               new FlatButton(
                 child: Text('Enviar'),
-                onPressed: () {
+                onPressed: () {                  
                   Navigator.of(context).pop();
                 },
               )
@@ -457,4 +460,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
         }
     );
   }
+
+
+
 }

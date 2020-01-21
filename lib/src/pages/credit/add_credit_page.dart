@@ -32,15 +32,7 @@ class AddCreditPage extends StatefulWidget {
 
 class _AddCreditPageState extends State<AddCreditPage> {
   // Variables para el mapa
-  final Set<Marker> _markers = Set();
 
-  CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(26.8206, 30.8025), zoom: 100.0);
-  Completer<GoogleMapController> _controller = Completer();
-
-  void _onMapCreated(GoogleMapController controller) {
-    _controller.complete(controller);
-  }
   double latSelected = 0.0;
   double longSelected = 0.0;
 
@@ -657,102 +649,6 @@ class _AddCreditPageState extends State<AddCreditPage> {
       longSelected = _latLng.longitude;      
       //_credit.rutaId = _route.id;
     });
-  }
-
-  Future _displayDialog(BuildContext context) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-          
-            contentPadding: EdgeInsets.all(0.0),
-            content: mapa(context),
-            actions: <Widget>[
-              new FlatButton(
-                child: Text('Enviar'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        });
-  }
-
-// codigo para el mapa
-
-  Future<Position> _getLoc() async {
-    return await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  }
-
-  FutureBuilder<Position> mapa(BuildContext context) {
-    return FutureBuilder<Position>(
-        future: _getLoc(),
-        builder: (context, snapshot) {          
-          if (!snapshot.hasData) {
-            return Container(
-              child: Column(                
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  SizedBox(height: 10),
-                  Text('Cargando mapa...')
-                ],
-              ),
-            );
-          } else {
-
-                if (latSelected==0.0) {
-                  latSelected = snapshot.data.latitude;
-                  longSelected = snapshot.data.longitude;
-                }
-            _initialPosition = CameraPosition(
-                target: LatLng(latSelected, longSelected),
-                zoom: 15.5);
-            // _markers.add(
-            //   Marker(
-            //       markerId: MarkerId('Mi localización'),
-            //       position:
-            //           LatLng(snapshot.data.latitude, snapshot.data.longitude),
-            //       infoWindow: InfoWindow(title: 'Cliente')),
-            // );
-            return _map();
-          }
-        });
-  }
-
-  _map() {
-    return Stack(
-      children: <Widget>[
-        GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: _initialPosition,
-          rotateGesturesEnabled: false,
-          markers: Set<Marker>.of(_markers),
-          onTap: (LatLng value){
-            _markers.clear();
-              _markers.add(
-                Marker(
-                    draggable: true,
-                    markerId: MarkerId('$value'),
-                    position: new LatLng(value.latitude, value.longitude),
-                    infoWindow: InfoWindow(
-                      title: 'Ubicacion Cliente',
-                    )),
-              );
-           
-            latSelected = value.latitude;
-            longSelected = value.longitude;
-            print("Coordenadas: $latSelected - $longSelected");
-             setState(() {
-              
-            });
-          },
-        ),
-      ],
-    );
   }
 
   //=================== CÁLCULOS

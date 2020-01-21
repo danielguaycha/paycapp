@@ -25,6 +25,15 @@ const Map<String, String> plazos = {
     'DOS_MESES': 'Dos meses'
 };
 
+const Map<String, String> categorias = {
+    'COMIDA'          : 'Comida',
+    'COMBUSTIBLE'     : 'Combustible',
+    'PAGO DE SERVICIO': 'Pago de servicio',
+    'SERVICIO BASICO' : 'Servicio basico',
+    'OTROS PAGOS'     : 'Otros pagos',
+    'OTROS'           : 'Otros',
+};
+
 const List<int> utilidad = [10, 20, 40];
 
 int defaultUtility = utilidad.elementAt(0);

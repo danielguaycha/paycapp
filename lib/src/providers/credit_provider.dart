@@ -31,17 +31,37 @@ class CreditProvider {
     }
   }
 
-  Future<Responser> cancel(int id) async {
+  Future<Responser> cancel(int id, String razon ) async {
+    print(id);
     try {
-      Response res = await _http.put('/credit/cancel', data: {"id": id});
+      Response res = await _http.put('/credit/cancel/$id', data: {"description" : razon });
       return Responser.fromJson(res.data);
     } catch (e) {
       return Responser.fromJson(processError(e));
     }
   }
 
-  Future<dynamic> list({int page: 1, int ruta}) async {
-    Response res = await _http.get("/credit?page=$page" + (ruta != null? "&ruta=$ruta" : ""));
+  Future<Responser> end(int id) async {
+    try {
+      Response res = await _http.put('/credit/end/$id');
+      return Responser.fromJson(res.data);
+    } catch (e) {
+      return Responser.fromJson(processError(e));
+    }
+  }
+
+  Future<dynamic> list({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null"}) async {
+
+    String url = "/credit?page=$page";
+    
+    url = (ruta !="null") ? url + "&ruta=$ruta" : url;
+    url = (plazo !="null") ? url + "&plazo=$plazo" : url;
+    url = (cobros !="null") ? url + "&cobro=$cobros" : url;
+
+    print("URL: $url");
+
+
+    Response res = await _http.get(url);
     return Responser.fromJson(res.data);
   }
 
@@ -51,15 +71,16 @@ class CreditProvider {
     return Responser.fromJson(res.data);
   }
 
-  //Supuestamente esto borra el pago
-  Future<dynamic> deletePayments(id) async {
+  //Supuestamente esto anula el pago
+  Future<dynamic> deletePayments(id, description) async {
     try {
-    Response res = await _http.delete("/payment/$id");
+    Response res = await _http.delete("/payment/$id", data: {"description": description});
     return Responser.fromJson(res.data);
     } catch (e) {
       return Responser.fromJson(processError(e));
     }
   }
+
 
   //Actualizar a mora
   Future<Responser> updatePayment(int id, int status) async {

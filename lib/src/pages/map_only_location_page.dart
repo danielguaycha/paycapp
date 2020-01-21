@@ -2,18 +2,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:paycapp/src/models/clientCredit_model.dart';
 
 
-double _latSelected = 0.0;
-double _longSelected = 0.0;
+double _latSelected;
+double _longSelected;
 
 class MapOnlyLocationPage extends StatefulWidget {
-    final latitud;
-  final longitud;
-  String name;
-  String addres;
+  final ClientCredit cliente;
+  // final latitud;
+  // final longitud;
+  // String name;
+  // String addres;
 
-  MapOnlyLocationPage({Key key, @required this.latitud, @required this.longitud, @required this.name, @required this.addres}) : super(key: key);
+  // MapOnlyLocationPage({Key key, @required this.latitud, @required this.longitud, @required this.name, @required this.addres}) : super(key: key);
+  MapOnlyLocationPage({Key key, @required this.cliente}) : super(key: key);
 
   @override
   _MapOnlyLocationPageState createState() => _MapOnlyLocationPageState();
@@ -30,8 +33,8 @@ class _MapOnlyLocationPageState extends State<MapOnlyLocationPage> {
 
   @override
   Widget build(BuildContext context) {
-    _latSelected = double.parse(widget.latitud);
-    _longSelected = double.parse(widget.longitud);
+    _latSelected = double.parse(widget.cliente.lat);
+    _longSelected = double.parse(widget.cliente.lng);
 
     return Scaffold(
         appBar: AppBar(
@@ -60,8 +63,8 @@ class _MapOnlyLocationPageState extends State<MapOnlyLocationPage> {
                         markerId: MarkerId('Inicial'),
                         position: new LatLng(_latSelected, _longSelected),                        
                         infoWindow: InfoWindow(
-                          title: this.widget.name.toUpperCase(),
-                          snippet: this.widget.addres.toUpperCase(),
+                          title: this.widget.cliente.name.toUpperCase(),
+                          snippet: (this.widget.cliente.address + " - " + this.widget.cliente.zone).toUpperCase(),
                         )),
                   );
                 _initialPosition = CameraPosition(target: LatLng(_latSelected, _longSelected),zoom: 15.5);
@@ -69,6 +72,7 @@ class _MapOnlyLocationPageState extends State<MapOnlyLocationPage> {
               }
             }))
             ;
+    
   }
 
   _map() {
