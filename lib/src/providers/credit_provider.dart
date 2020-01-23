@@ -32,7 +32,6 @@ class CreditProvider {
   }
 
   Future<Responser> cancel(int id, String razon ) async {
-    print(id);
     try {
       Response res = await _http.put('/credit/cancel/$id', data: {"description" : razon });
       return Responser.fromJson(res.data);
@@ -57,9 +56,6 @@ class CreditProvider {
     url = (ruta !="null") ? url + "&ruta=$ruta" : url;
     url = (plazo !="null") ? url + "&plazo=$plazo" : url;
     url = (cobros !="null") ? url + "&cobro=$cobros" : url;
-
-    print("URL: $url");
-
 
     Response res = await _http.get(url);
     return Responser.fromJson(res.data);

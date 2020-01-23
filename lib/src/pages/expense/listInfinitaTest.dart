@@ -17,22 +17,47 @@ String _dateTo = "null";
 DateFormat formatter = new DateFormat('yyyy-MM');
 TextEditingController _inputDateFrom = new TextEditingController();
 TextEditingController _inputDateTo = new TextEditingController();
- 
-class ListExpensePage extends StatefulWidget {
-  ListExpensePage({Key key}) : super(key: key);
+ScrollController _controller = new ScrollController();
+//Lista infinita
+List<dynamic> gastosObjeto = new List();
+//Fin Variables
+class ListaInfinita extends StatefulWidget {
+  ListaInfinita({Key key}) : super(key: key);
 
   @override
-  _ListExpensePageState createState() => _ListExpensePageState();
+  _ListaInfinitaState createState() => _ListaInfinitaState();
 }
 
-class _ListExpensePageState extends State<ListExpensePage> {
+class _ListaInfinitaState extends State<ListaInfinita> {
   bool _actualizar = true;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _textEditingController = new TextEditingController();
   String _reason = "";
   ProgressLoader _loader;
-  //Lista infinita
-  List<dynamic> gastosObjeto = new List();
+
+
+  @override
+  void initState() { 
+    super.initState();
+
+    _controller.addListener((){
+    if(_controller.position.pixels == _controller.position.maxScrollExtent){
+      print("Llegaste al fin");
+      print("Lista: ${gastosObjeto.length}");
+
+    }
+
+    });
+
+    
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    //_controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +81,15 @@ class _ListExpensePageState extends State<ListExpensePage> {
     );
   }
 
+  // FutureBuilder _peticion() {
+  //   Future<Responser<dynamic>> res =  ExpenseProvider().list(page: 1, dateFrom: _dateFrom, dateTo: _dateTo);
+  //   AsyncSnapshot<Responser<dynamic>> x = res;
+  // }
+
   Widget _expenseList() {
     return FutureBuilder(
       //lista del servidor
-      future: _actualizar
-          ? ExpenseProvider()
-              .list(page: 1, dateFrom: _dateFrom, dateTo: _dateTo)
-          : null,
+      future: _actualizar ? ExpenseProvider().list(page: 1, dateFrom: _dateFrom, dateTo: _dateTo) : null,
       builder: (context, snapshot) {
         _actualizar = false;
 
@@ -76,14 +103,17 @@ class _ListExpensePageState extends State<ListExpensePage> {
         if (results != null && results.length <= 0) {
           return renderNotFoundData("No hay gastos para mostrar");
         }
+        gastosObjeto.add(results[0]);
         return ListView.separated(
+          controller: _controller,
           separatorBuilder: (context, index) => Container(
             height: 0.0,
             width: 0.0,
           ),
-          itemCount: results.length,
+          itemCount: gastosObjeto.length,
           itemBuilder: (BuildContext context, int index) {
-            var expense = (results[index]);
+            var expense = (gastosObjeto[index]);
+            print("EXPENSE: $expense");
             return _elements(context, expense);
           },
         );

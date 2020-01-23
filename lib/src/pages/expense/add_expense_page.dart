@@ -31,12 +31,15 @@ class _AddExpensePageState extends State<AddExpensePage> {
   String _description = "";
   String _fecha = "";
   File _image;
-  TextEditingController _inputFieldDateController = new TextEditingController();
   bool _cargarFechaActual = true;
+  bool _changeWidget = false;
   ProgressLoader _loader;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   DateFormat formatter = new DateFormat('yyyy-MM-dd');
-  
+  TextEditingController _inputFieldDateController = new TextEditingController();
+  TextEditingController _controllerMonto = new TextEditingController();
+  TextEditingController _controllerCategoria = new TextEditingController();
+  TextEditingController _controllerDescripcion = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     _loader = new ProgressLoader(context);
@@ -70,7 +73,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
             _crearInputDate(context),
             //Campo Categoria
               SizedBox(height: 2),
-            _comboCategorias(context),
+            _changeWidget ? _categoryField() : _comboCategorias(context),
             //Campo Importe
               SizedBox(height: 2),
             _montoField(),
@@ -122,7 +125,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   // Plazo
-  _comboCategorias(context) {
+  Widget _comboCategorias(context) {
     return Container(
       margin: EdgeInsets.only(top: 2),
       child: DropdownButtonFormField(
@@ -130,17 +133,23 @@ class _AddExpensePageState extends State<AddExpensePage> {
           //hint: new Text("Plazo"),
           items: listItems(categorias),
           decoration: InputDecoration(
-            icon: Icon(Icons.query_builder),
+            icon: Icon(Icons.category),
             labelText: 'Plazo',
           ),
-          onSaved: (v) {},
-          validator: (v) {
-            if (v == null || v == '') return 'Selecciona un plazo';
-            return null;
-          },
+          // onSaved: (v) {},
+          // validator: (v) {
+          //   if (v == null || v == '') return 'Selecciona un plazo';
+          //   return null;
+          // },
           onChanged: (opt) {
-            setState(() {
+            if(opt == "OTROS"){
+
+              _changeWidget = true;
+              _opcionSeleccionada = "null";
+            }else{
               _opcionSeleccionada = opt;
+            }
+            setState(() {
             });
           },
         ),
@@ -148,17 +157,16 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   // Monto
-  _montoField() {
+  Widget _montoField() {
     return TextFormField(
-      initialValue: '',
-//      textInputAction: TextInputAction.done,
+      //initialValue: "",
+      controller: _controllerMonto,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
         labelText: 'Monto \$ *',
         hintText: '\$ 0.00',
         icon: Icon(Icons.attach_money),
       ),
-//      onFieldSubmitted: (v) {},
       onChanged: (v) {
         if (isNumeric(v)) {
           _monto = double.parse(v);
@@ -176,16 +184,30 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
+  // Categoria Input
+  Widget _categoryField() {
+    return TextFormField(
+      //initialValue: "",
+      controller: _controllerCategoria,
+      decoration: InputDecoration(
+        labelText: 'Categoria',
+        icon: Icon(Icons.category),
+      ),      
+      onChanged: (v) {
+          _opcionSeleccionada = v;
+      },
+    );
+  }
+  
   // Descripcion
   _descriptionField() {
     return TextFormField(
-      initialValue: '',
-      //textInputAction: TextInputAction.done,
+      controller: _controllerDescripcion,
+      //initialValue: "",
       decoration: InputDecoration(
         labelText: 'Descripción',
         icon: Icon(Icons.comment),
       ),      
-      //onFieldSubmitted: (v) {_description = v;},
       onChanged: (v) {
           _description = v;
       },
@@ -283,9 +305,16 @@ class _AddExpensePageState extends State<AddExpensePage> {
       child: Icon(Icons.save, color: Colors.white,),      
       onPressed: () async {
         // Guardar datos
-        if(_monto <= 0){
+        if(_monto <= 0)
+        {
             _scaffoldKey.currentState.showSnackBar(customSnack("El monto debe ser mayor a 0", type: 'err'));
-        }else{
+            return;
+        }
+        if(_changeWidget && (_opcionSeleccionada == "null" || cadenaValida(_opcionSeleccionada) || _opcionSeleccionada.isEmpty))
+        {
+          _scaffoldKey.currentState.showSnackBar(customSnack("Debe ingresar una categoria", type: 'err'));
+          return;
+        }
           int isOk = await Alert.confirm(context,
           title: "Confirmar",
           content: "¿Está seguro que desea guardar este gasto?");
@@ -294,17 +323,41 @@ class _AddExpensePageState extends State<AddExpensePage> {
               return;
           }
           
-          _loader.show(msg: "Procesando crédito, espere");
+          _loader.show(msg: "Procesando gasto, espere");
           
           Responser res = await ExpenseProvider().store(_monto, _opcionSeleccionada, _description, _fecha, _image);
-          print("Mensaje $res");
+          //print("Mensaje $res");
           if (res.ok) {
-            _scaffoldKey.currentState.showSnackBar(customSnack("Crédito procesao con exito"));
+            _scaffoldKey.currentState.showSnackBar(customSnack("Gasto registrado con exito"));
+            _limpiar();
           } else {
             _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
           }
           _loader.hide();
-        }
+        
       });
   }
+
+  void _limpiar(){
+  _monto = 0.0;
+  _opcionSeleccionada = 'COMIDA';
+  _fecha = "";
+  _cargarFechaActual = true;
+  _description = "";
+  _image = null;
+  _changeWidget = false;
+  _controllerMonto.text = "";
+  _controllerDescripcion.text = "";
+  _controllerCategoria.text = "";
+  setState(() {});
+  }
+
+  bool cadenaValida(String cadena){
+    for (var i = 0; i < cadena.length; i++) {
+      if (cadena[i] != ' '){return false;}      
+    }
+    return true;
+
+  }
+
 }

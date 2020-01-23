@@ -34,11 +34,17 @@ class ExpenseProvider{
     
     url = (dateFrom !="null") ? url + "&from=$dateFrom" : url;
     url = (dateTo !="null") ? url + "&to=$dateTo" : url;
+    
+    Response res = await _http.get(url);
+    return Responser.fromJson(res.data);
+  }
 
-    print("URL: $url");
-
-      Response res = await _http.get(url);
-      return Responser.fromJson(res.data);
-
+    Future<Responser> invalidate(int id, String reason) async {
+      try {
+        Response res = await _http.delete('/expense/$id', data: {"description" : reason });
+        return Responser.fromJson(res.data);
+      } catch (e) {
+        return Responser.fromJson(processError(e));
+      }
   }
 }

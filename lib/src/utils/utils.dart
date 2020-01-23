@@ -181,6 +181,13 @@ Future<bool> checkConn() async {
     }
 }
 
+String getImagen(String imageName){
+
+  return "$urlApi/image/$imageName";
+}
+
+
+
 bool isNumeric(String s) {
   if(s == null) {
     return false;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:paycapp/src/pages/credit/list_credit_page.dart';
+import 'package:paycapp/src/pages/expense/listInfinitaTest.dart';
 import 'package:paycapp/src/pages/expense/list_expense_page.dart';
 import 'package:paycapp/src/pages/index_page.dart';
 import 'package:paycapp/src/pages/user/user_page.dart';
@@ -29,7 +30,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         children: <Widget>[
           IndexPage(),
           ListCreditPage(),
-          ListExpensePage(),
+          ListaInfinita(),
           UserPage(),
         ],
       ),
