@@ -109,7 +109,6 @@ class SearchClientDelegate extends SearchDelegate<Person> {
   Widget buildSuggestions(BuildContext context) {
     return ListView(
       children: <Widget>[
-        _getLastClient(context),
         ListTile(
           leading: Icon(Icons.person_add),
           title: Text('Nuevo Cliente'),
@@ -117,6 +116,7 @@ class SearchClientDelegate extends SearchDelegate<Person> {
             Navigator.of(context).pushNamed('client_add');
           },
         ),
+        _getLastClient(context),        
         ListTile(
           leading: Icon(Icons.arrow_back),
           title: Text('Regresar'),
@@ -126,6 +126,60 @@ class SearchClientDelegate extends SearchDelegate<Person> {
         ),
       ],
     );
+  }
+
+    Widget _creditList() {
+    //_listClients.clear();
+    return FutureBuilder(
+      //lista del servidor
+      future: ClientProvider().listOrSearch(),
+      builder: (context, snapshot) {
+
+        if (snapshot.hasError) {
+          return renderError(snapshot.error, _retry);
+        }
+
+        if (!snapshot.hasData) return loader(text: "Cargando créditos...");
+
+        var results = snapshot.data.data;
+
+        print(results);
+
+        if (results != null && results.length <= 0) {
+          return renderNotFoundData("No hay creditos para mostrar");
+        }
+
+        return ListView.separated(
+          separatorBuilder: (context, index) => Container(
+            height: 0.0,
+            width: 0.0,
+          ),
+          itemCount: results.length,
+          itemBuilder: (BuildContext context, int index) {
+          var client = (results[index]);
+            return ListTile(
+              leading: Icon(Icons.person, size: 30, color: Theme.of(context).accentColor),
+              trailing: Icon(Icons.add, color: Theme.of(context).primaryColor),
+              title: Text( "${client["name"]} ${client["surname"]}".toUpperCase(),
+                style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text("${client["address"]}"),
+              onTap: () {
+                // close(context, person);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+  _retry() {
+    //locations.clear();
+    // setState(() {});
   }
 
   Widget _getLastClient(context) {

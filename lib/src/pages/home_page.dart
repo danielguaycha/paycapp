@@ -7,6 +7,8 @@ import 'package:paycapp/src/pages/index_page.dart';
 import 'package:paycapp/src/pages/user/user_page.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
 
+import 'client/list_client_page.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -30,7 +32,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         children: <Widget>[
           IndexPage(),
           ListCreditPage(),
-          ListaInfinita(),
+          ListExpensePage(),
           UserPage(),
         ],
       ),

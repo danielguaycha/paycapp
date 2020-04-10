@@ -1,0 +1,11 @@
+--Listar emuladores  Opcion A
+cd C:/Users/Nixon/AppData/Local/Android/Sdk/tools/bin && ./avdmanager.bat list avd
+
+--Listar emuladores  Opcion B
+cd C:/Users/Nixon/AppData/Local/Android/Sdk/tools/bin && avdmanager list avd
+
+--Ejecutar emulador con nombre "Emulador"
+cd C:/Users/Nixon/AppData/Local/Android/Sdk/tools && emulator.exe -avd Emulador
+
+--Ejecutar emulador con nombre "Emulador"
+cd C:/Users/Nixon/AppData/Local/Android/Sdk/tools && ./emulator.exe -avd Emulador

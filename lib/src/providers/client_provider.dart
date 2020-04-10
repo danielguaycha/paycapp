@@ -8,6 +8,23 @@ class ClientProvider {
 
   final _http = HttpClient().dio;
 
+  //list client
+  
+  Future<dynamic> listOrSearch({bool search = false, String textToSearch = "null" }) async {
+    
+    String url = "/client/";
+    
+    if(search && textToSearch != "null"){
+      url = url + "/search?q=" + textToSearch;
+      Response res = await _http.get(url);
+      return Responser.fromJson(res.data);
+    }else{
+      Response res = await _http.get(url);
+      return Responser.fromJson(res.data);
+    }
+  }
+
+
   // store client 
   Future<Responser> store(Person client) async {
     try {

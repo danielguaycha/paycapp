@@ -12,6 +12,7 @@ import 'package:paycapp/src/models/credit_model.dart';
 import 'package:paycapp/src/models/person_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/models/ruta_model.dart';
+import 'package:paycapp/src/pages/client/list_client_page.dart';
 import 'package:paycapp/src/pages/client/search_client_delegate.dart';
 import 'package:paycapp/src/pages/routes/route_selection_page.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
@@ -617,8 +618,10 @@ class _AddCreditPageState extends State<AddCreditPage> {
 
   // Buscar clientes
   searchClient(context) async {
-    _client =
-        await showSearch(context: context, delegate: SearchClientDelegate());
+    _client = await Navigator.push(context, MaterialPageRoute(builder: (context) => ListClient()));
+
+    //_client = await showSearch(context: context, delegate: SearchClientDelegate());
+
     if (_client == null) return;
 
     _credit.utilidad = defaultUtility;

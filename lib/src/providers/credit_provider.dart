@@ -3,6 +3,9 @@ import 'package:paycapp/src/models/credit_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/plugins/http.dart';
 import 'package:paycapp/src/utils/utils.dart' show processError;
+//Other
+import 'package:paycapp/src/models/credit_new_model.dart';
+import 'dart:convert';
 
 class CreditProvider {
   final _http = HttpClient().dio;
@@ -96,4 +99,29 @@ class CreditProvider {
     Response res = await _http.get('/credit/$id');
     return Responser.fromJson(res.data);
   }
+
+  //Nuevo provider 31/03/2020
+  Future<List<CreditNew>> getlist({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null"}) async {
+
+    String url = "/credit?page=$page";
+    
+    url = (ruta !="null") ? url + "&ruta=$ruta" : url;
+    url = (plazo !="null") ? url + "&plazo=$plazo" : url;
+    url = (cobros !="null") ? url + "&cobro=$cobros" : url;
+
+    final resp = await _http.get(url);
+    final decodedData = json.decode(resp.data.toString());
+
+    Response res = await _http.get(url);
+    //return Responser.fromJson(res.data);
+
+
+
+    // final creditNews = CreditNews.fromJsonList(decodedData);
+    // print("DATA: $creditNews");
+    print("JSON");
+     print(res);
+
+    return [];
+    }
 }

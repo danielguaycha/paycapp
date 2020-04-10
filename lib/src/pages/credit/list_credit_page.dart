@@ -36,6 +36,9 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     double heightDevice = MediaQuery.of(context).size.height;
  
     _loader = new ProgressLoader(context);
+
+    //CreditProvider().getlist();
+
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
           label: Text("Ver en mapa", style: TextStyle(color: Colors.white),),
@@ -73,7 +76,8 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
   }
 
   bool _actualizar = true;
-  _creditList() {
+  
+  Widget _creditList() {
     _listClients.clear();
     return FutureBuilder(
       //lista del servidor
@@ -88,6 +92,8 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
         if (!snapshot.hasData) return loader(text: "Cargando créditos...");
 
         var results = snapshot.data.data;
+
+        print(results);
 
         if (results != null && results.length <= 0) {
           return renderNotFoundData("No hay creditos para mostrar");

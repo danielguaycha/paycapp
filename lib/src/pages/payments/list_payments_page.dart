@@ -1,3 +1,6 @@
+import 'dart:ffi';
+import 'dart:math';
+
 import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -92,7 +95,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               children: <Widget>[
                 Expanded(
                   child: _labelInformation(
-                      contenido: "${results['total_pagado']}",
+                      contenido: redondear("${results['total_pagado']}"),
                       etiqueta: "Total pagado"),
                 ),
                 _line(),
@@ -370,18 +373,25 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               // }
             },
           ),
-          IconSlideAction(
-            caption: 'Ver detalle',
-            color: Colors.amber,
-            icon: Icons.list,
-            onTap: () async {
-              // bool process = await _showDetail(widget.id, context);
-              // if (process) {
-              //   print("Detalle de: ${widget.id}");
-              // }
-            },
-          ),
+          // IconSlideAction(
+          //   caption: 'Ver detalle',
+          //   color: Colors.amber,
+          //   icon: Icons.list,
+          //   onTap: () async {
+          //     // bool process = await _showDetail(widget.id, context);
+          //     // if (process) {
+          //     //   print("Detalle de: ${widget.id}");
+          //     // }
+          //   },
+          // ),
         ]);
+  }
+
+  //Redondear
+  String redondear(String value, {int decimales = 2}){
+    double d = double.parse(value);    
+    String dato = (d).toStringAsFixed(decimales);
+    return dato;
   }
 
 

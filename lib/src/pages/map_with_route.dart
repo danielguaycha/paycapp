@@ -49,7 +49,8 @@ class _MapRoutePageState extends State<MapRoutePage> {
 
   @override
   Widget build(BuildContext context) {
-        getCoordinates(widget.cliente);
+    
+    getCoordinates(widget.cliente);
 
     return Scaffold(
         appBar: AppBar(
