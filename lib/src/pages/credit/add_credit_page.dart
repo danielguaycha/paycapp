@@ -19,7 +19,7 @@ import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart' show customSnack;
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart'
-    show listItems, isNumeric, listItemsNormal;
+    show isNumeric, listItems, listItemsNormal, money;
 import 'package:paycapp/src/config.dart'
     show plazos, utilidad, cobros, defaultUtility;
 
@@ -55,7 +55,7 @@ class _AddCreditPageState extends State<AddCreditPage> {
   bool _prenda;
   bool _geoloc;
   bool _enabled;
-
+  bool _changeCobro;
   @override
   void initState() {
     super.initState();
@@ -64,7 +64,8 @@ class _AddCreditPageState extends State<AddCreditPage> {
     _enabled = false;
     _prenda = false;
     _geoloc = true;
-  }
+    _changeCobro = true;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -352,8 +353,8 @@ class _AddCreditPageState extends State<AddCreditPage> {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
-        labelText: 'Monto \$ *',
-        hintText: '\$ 0.00',
+        labelText: 'Monto ${money("")} *',
+        hintText: money("0.0"),
         icon: Icon(Icons.attach_money),
       ),
       onFieldSubmitted: (v) {},
@@ -398,6 +399,7 @@ class _AddCreditPageState extends State<AddCreditPage> {
           onChanged: (opt) {
             setState(() {
               _credit.plazo = opt;
+              _changeCobro = true;
             });
             _calcular();
           },
@@ -406,6 +408,56 @@ class _AddCreditPageState extends State<AddCreditPage> {
     );
   }
 
+
+  // Tiempo de cobro
+  _comboCobro(context) {
+    Map<String, String> newListCobros = {
+    'DIARIO': 'Diario',
+    'SEMANAL': 'Semanal',
+    'QUINCENAL': 'Quincenal',
+    'MENSUAL': 'Mensual',
+};
+
+  if(_changeCobro){
+    if(_credit.plazo == "SEMANAL"){
+      _credit.cobro = null;
+      newListCobros.remove('QUINCENAL');
+      newListCobros.remove('MENSUAL');      
+      print("Eliminar Quincenal, mensual");
+    }
+    if(_credit.plazo == "QUINCENAL"){
+      _credit.cobro = null;
+      newListCobros.remove('MENSUAL');      
+      print("Eliminar Quincenal, mensual");
+    }
+  }
+
+    return Container(
+      margin: EdgeInsets.only(top: 2),
+      child: IgnorePointer(
+        ignoring: !_enabled,
+        child: DropdownButtonFormField(
+          value: _credit.cobro == null ? newListCobros['Diario'] : _credit.cobro,
+          // hint: new Text("Tipo de cobro"),
+          items: listItems(newListCobros),
+          decoration: InputDecoration(
+              icon: Icon(Icons.calendar_today), labelText: 'Tipo de cobro'),
+          onSaved: (v) => _credit.cobro = v,
+          validator: (v) {
+            if (v == null || v == '') return 'Selecciona un cobro';
+            return null;
+          },
+          onChanged: (opt) {
+            setState(() {
+              _credit.cobro = opt;
+              _changeCobro = false;
+            });
+            _calcular();
+          },
+        ),
+      ),
+    );
+  }
   // Utilidad
   _comboUtilidad(context) {
     return Container(
@@ -429,34 +481,6 @@ class _AddCreditPageState extends State<AddCreditPage> {
               return 'Seleccione una utilidad';
             }
             return null;
-          },
-        ),
-      ),
-    );
-  }
-
-  // Tiempo de cobro
-  _comboCobro(context) {
-    return Container(
-      margin: EdgeInsets.only(top: 2),
-      child: IgnorePointer(
-        ignoring: !_enabled,
-        child: DropdownButtonFormField(
-          value: _credit.cobro,
-          // hint: new Text("Tipo de cobro"),
-          items: listItems(cobros),
-          decoration: InputDecoration(
-              icon: Icon(Icons.calendar_today), labelText: 'Tipo de cobro'),
-          onSaved: (v) => _credit.cobro = v,
-          validator: (v) {
-            if (v == null || v == '') return 'Selecciona un cobro';
-            return null;
-          },
-          onChanged: (opt) {
-            setState(() {
-              _credit.cobro = opt;
-            });
-            _calcular();
           },
         ),
       ),
@@ -666,17 +690,20 @@ class _AddCreditPageState extends State<AddCreditPage> {
           children: <Widget>[
             Container(
               child: Text(
-                  'Utilidad \$: ${_credit.totalUtilidad.toStringAsFixed(2)}'),
+                  'Utilidad: ${money(_credit.totalUtilidad)}'),
+                  //'Utilidad \$: ${_credit.totalUtilidad.toStringAsFixed(2)}'),
             ),
             Container(
-              child: Text('Total \$: ${_credit.total}'),
+              child: Text('Total: ${money(_credit.total)}'),
+              // child: Text('Total \$: ${_credit.total}'),
             ),
           ],
         ),
         Column(
           children: <Widget>[
             Container(
-              child: Text('Pagos de \$ ${_credit.pagosDe.toStringAsFixed(2)}'),
+              child: Text('Pagos de ${money(_credit.pagosDe)}'),
+              // child: Text('Pagos de \$ ${_credit.pagosDe.toStringAsFixed(2)}'),
             ),
             Container(
               child: Text('Numero de pagos ${_credit.npagos}'),

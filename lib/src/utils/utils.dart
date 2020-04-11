@@ -186,6 +186,22 @@ String getImagen(String imageName){
   return "$urlApi/image/$imageName";
 }
 
+String money(value){
+  String text = "0.0";
+  if(value is double){
+    text = "\$ ${(value).toStringAsFixed(2)}";
+  }
+
+  if(value is String){
+    if(isNumeric(value)){
+      text = "\$ ${double.parse(value).toStringAsFixed(2)}";
+    }else{
+      text = "\$ $value";
+    }
+  }
+
+  return text;
+}
 
 
 bool isNumeric(String s) {

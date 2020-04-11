@@ -4,6 +4,7 @@ import 'package:paycapp/src/pages/credit/list_credit_page.dart';
 import 'package:paycapp/src/pages/expense/listInfinitaTest.dart';
 import 'package:paycapp/src/pages/expense/list_expense_page.dart';
 import 'package:paycapp/src/pages/index_page.dart';
+import 'package:paycapp/src/pages/payments/show_payments_page.dart';
 import 'package:paycapp/src/pages/user/user_page.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
 
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void initState() {  
     super.initState();
-    _tabController = new TabController(length: 4, initialIndex: 0, vsync: this);
+    _tabController = new TabController(length: 5, initialIndex: 0, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         children: <Widget>[
           IndexPage(),
           ListCreditPage(),
+          ShowPaymentsPage(),
           ListExpensePage(),
           UserPage(),
         ],
@@ -43,6 +45,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           tabs: <Widget>[
             new Tab(icon: Icon(FontAwesomeIcons.home)),
             new Tab(icon: Icon(Icons.payment)),
+            new Tab(icon: Icon(Icons.pages)),
             new Tab(icon: Icon(Icons.monetization_on)),
             new Tab(icon: Icon(Icons.settings)),
           ],

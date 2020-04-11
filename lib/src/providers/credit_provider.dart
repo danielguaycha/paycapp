@@ -52,7 +52,8 @@ class CreditProvider {
     }
   }
 
-  Future<dynamic> list({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null"}) async {
+  Future<dynamic> list({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null", String search = "null"}) async {
+    if(search == "null"){
 
     String url = "/credit?page=$page";
     
@@ -62,6 +63,13 @@ class CreditProvider {
 
     Response res = await _http.get(url);
     return Responser.fromJson(res.data);
+    }else{
+    
+      String url = "/credit/search?q=$search";
+      Response res = await _http.get(url);
+      return Responser.fromJson(res.data);
+    }
+
   }
 
   //Listar el historial de pagos

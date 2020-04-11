@@ -1,18 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:paycapp/src/pages/user/change_password_page.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
 
 import '../../config.dart';
 
-class UserPage extends StatefulWidget {
+class ChangePassword extends StatefulWidget {
   @override
-  _UserPageState createState() => _UserPageState();
+  _ChangePasswordState createState() => _ChangePasswordState();
 }
 
-class _UserPageState extends State<UserPage> {
-  final _prefs = LocalStorage();
+class _ChangePasswordState extends State<ChangePassword> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,9 +39,8 @@ class _UserPageState extends State<UserPage> {
                 Expanded(
                   child: Container()
                 ),
-                 _botton("Cambiar Contraseña", _changePassword),
+                 _botton("Cambiar Contraseña", _back),
                 Divider(),
-                _botton("Cerrar Sesión", _logOut),
                 Expanded(
                   child: Container()
                 ),
@@ -66,7 +64,7 @@ class _UserPageState extends State<UserPage> {
         border: Border.all(color: Colors.transparent),
       ),
       child: Center(
-        child: Icon(Icons.person, color: Colors.white, size: 100.0,),
+        child: Icon(Icons.lock, color: Colors.white, size: 100.0,),
       ),
     );
   }
@@ -89,12 +87,7 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  void _changePassword(){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePassword()));
-  }
-
-  void _logOut() {
-    _prefs.token = null;
-    Navigator.pushReplacementNamed(context, 'login');
+  void _back() {
+    Navigator.pop(context);
   }
 }

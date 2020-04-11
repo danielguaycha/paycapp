@@ -12,7 +12,7 @@ import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart'
-    show renderError, loader, renderNotFoundData;
+    show loader, money, renderError, renderNotFoundData;
 import 'package:paycapp/src/config.dart' show colors;
 import '../map_only_location_page.dart';
 import '../map_with_route.dart';
@@ -81,7 +81,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     _listClients.clear();
     return FutureBuilder(
       //lista del servidor
-      future: _actualizar ? CreditProvider().list(plazo: _valorPlazo, cobros: _valorCobro, ruta: _valorRuta) : null,
+      future: _actualizar ? CreditProvider().list(plazo: _valorPlazo, cobros: _valorCobro, ruta: _valorRuta, search: _search) : null,
       builder: (context, snapshot) {
         _actualizar = false;
 
@@ -134,7 +134,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
                 fontWeight: FontWeight.w500),
           ),
           subtitle: Text(
-              "Plazo: ${credit['plazo']} | Total: \$${double.parse(credit['total']).toStringAsFixed(2)}"),
+              "Plazo: ${credit['plazo']} | Total: ${money(credit['total'])}"),
           onTap: () {
             Navigator.push(
                 context,
@@ -236,19 +236,63 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
   String _valorPlazo = "null";
   String _valorCobro = "null";
   String _valorRuta = "null";
+  String _search = "null";
+  bool isSearching = false;
 
   Widget _title() {
     return Row(
       children: <Widget>[
-        Text("Lista de creditos"),
+        !isSearching
+            ? Text('Lista de Creditos')
+            : 
+            SizedBox(
+              width: 100.0,
+              child: 
+            TextField(
+              
+                onSubmitted: (v) {},
+                onChanged: (value) {
+                  _search = value;
+                  _actualizar = true;
+                  setState(() {
+                    
+                  });
+                  // _filterCountries(value);
+                },
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                    // icon: Icon(Icons.search, color: Colors.white,),
+                    hintText: "Buscar cliente",
+                    hintStyle: TextStyle(color: Colors.white)),
+              ),
+              
+            ),
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {},
-              )
+              isSearching
+              ? IconButton(
+                  icon: Icon(Icons.cancel),
+                  onPressed: () {
+                    setState(() {
+                      this.isSearching = false;
+                      _search = "null";
+                  _actualizar = true;
+                      //llenar los datos con la busqueda
+                      // filteredCountries = countries;
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      this.isSearching = true;
+                    });
+                  },
+                )
             ],
           ),
         )

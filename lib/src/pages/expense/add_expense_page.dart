@@ -163,8 +163,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
       controller: _controllerMonto,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
-        labelText: 'Monto \$ *',
-        hintText: '\$ 0.00',
+        labelText: 'Monto ${money("")}*',
+        hintText: money(null),
         icon: Icon(Icons.attach_money),
       ),
       onChanged: (v) {

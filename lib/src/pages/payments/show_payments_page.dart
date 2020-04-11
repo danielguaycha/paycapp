@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:paycapp/src/utils/utils.dart';
 
 //Variables
 String _fecha = "";
@@ -167,7 +168,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
                     Column(
                       children: <Widget>[
                         Text(
-                          "\$ $value",
+                          money(value),
                           textAlign: TextAlign.right,
                           style: TextStyle(
                             fontSize: 20,

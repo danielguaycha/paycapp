@@ -73,11 +73,11 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               children: <Widget>[
                 Expanded(
                   child: _mediumCircle(
-                      value: "\$ ${results['monto']}", etiqueta: "Prestamo"),
+                      value: money(results['monto']), etiqueta: "Prestamo"),
                 ),
                 Expanded(
                   child: _bigCircle(
-                      value: "\$ ${results['total']}",
+                      value: money(results['total']),
                       etiqueta: "Total a pagar"),
                 ),
                 Expanded(
@@ -95,7 +95,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               children: <Widget>[
                 Expanded(
                   child: _labelInformation(
-                      contenido: redondear("${results['total_pagado']}"),
+                      contenido: money(results['total_pagado']),
                       etiqueta: "Total pagado"),
                 ),
                 _line(),
@@ -128,6 +128,10 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   Container _labelClient({
     String contenido: '',
   }) {
+    double fontSize = 20.0;
+    if(contenido.length > 25){fontSize = 17.0;}
+    if(contenido.length > 30){fontSize = 15.0;}
+
     return Container(
       padding: EdgeInsets.all(10.0),
       margin: EdgeInsets.all(10.0),
@@ -138,12 +142,12 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             "Cliente: ",
             textAlign: TextAlign.right,
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.black),
           ),
           Text(
             "$contenido",
             textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 20, color: Colors.black54),
+            style: TextStyle(fontSize: fontSize, color: Colors.black54),
           ),
         ],
       ),
@@ -307,7 +311,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
                     Column(
                       children: <Widget>[
                         Text(
-                          "\$ $value",
+                          money(value),
                           style: TextStyle(
                               fontSize: 20,
                               color: _color,
