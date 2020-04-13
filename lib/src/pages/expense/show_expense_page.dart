@@ -39,7 +39,7 @@ class _ShowExpensePageState extends State<ShowExpensePage> {
               SizedBox(height: 2),
               _field(text: widget.expenseValue["category"], labeltext: 'Categoria', icon: Icons.category),
               SizedBox(height: 2),
-              _field(text: widget.expenseValue["monto"], labeltext: 'Monto', icon: Icons.monetization_on),
+              _field(text: money(widget.expenseValue["monto"]), labeltext: 'Monto', icon: Icons.monetization_on),
               SizedBox(height: 2),
               _field(text: widget.expenseValue["description"], labeltext: 'Descripcion', icon: Icons.comment),
               SizedBox(height: 2),

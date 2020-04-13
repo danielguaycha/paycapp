@@ -63,9 +63,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
   Widget _bodyPayments(results) {
-    return SlidingUpPanel(
-      body: SingleChildScrollView(
-        child: Column(
+    return  Column(
           children: <Widget>[
             _labelClient(
                 contenido:
@@ -106,36 +104,22 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
                 ),
               ],
             ),
+            Expanded(
+              child: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results))
           ],
-        ),
-      ),
-
-      onPanelOpened: () {
-        setState(() {
-          iconoPanel = new Icon(Icons.arrow_downward);
-        });
-      },
-      onPanelClosed: () {
-        setState(() {
-          iconoPanel = new Icon(Icons.arrow_upward);
-        });
-      },
-      panelSnapping: true,
-      parallaxEnabled: true,
-      panel: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results),
-    );
+        );
   }
 
   Container _labelClient({
     String contenido: '',
   }) {
-    double fontSize = 20.0;
+    double fontSize = 16.0;
     if(contenido.length > 25){fontSize = 17.0;}
     if(contenido.length > 30){fontSize = 15.0;}
 
     return Container(
-      padding: EdgeInsets.all(10.0),
-      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(0.0),
+      margin: EdgeInsets.only(top: 10, bottom: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -143,8 +127,9 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             "Cliente: ",
             textAlign: TextAlign.right,
             style: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.black),
+                fontSize: fontSize, fontWeight: FontWeight.w500, color: Colors.black54),
           ),
+          SizedBox(width: 5,),
           Text(
             "$contenido",
             textAlign: TextAlign.left,
@@ -158,16 +143,15 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   Container _bigCircle(
       {String value: "0.0",
       String etiqueta: '',
-      double widthAndheight: 130.0,
-      double fontSize: 25}) {
+      double widthAndheight: 120.0,
+      double fontSize: 22}) {
     return Container(
-      margin: EdgeInsets.all(5.0),
       width: widthAndheight,
       height: widthAndheight,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white,
-        border: Border.all(),
+        color: Colors.white54,
+        border: Border.all(color: Colors.black26),    
       ),
       child: Center(
         child: Column(
@@ -184,7 +168,10 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             Text(
               "$etiqueta",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 15, 
+                color: Colors.black38,          
+                fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -193,14 +180,14 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
   Container _mediumCircle({String value: "0.0", String etiqueta: ''}) {
-    double fontSize = 20;
+    double fontSize = 16;
     if (value.toString().length > 7) {
       fontSize = 16;
     }
     return _bigCircle(
         value: value,
         etiqueta: etiqueta,
-        widthAndheight: 90.0,
+        widthAndheight: 95.0,
         fontSize: fontSize);
   }
 
@@ -210,13 +197,13 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
 
   Container _labelDetail({String description: ""}) {
     return Container(
-      padding: EdgeInsets.all(10.0),
-      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(2.0),
+      margin: EdgeInsets.only(top: 10, bottom: 5),
       child: Text(
         "$description",
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 20, color: Colors.black54),
+        style: TextStyle(fontSize: 16, color: Colors.black54),
         maxLines: 3,
       ),
     );
@@ -224,8 +211,8 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
 
   Container _labelInformation({String contenido: '', String etiqueta: ''}) {
     return Container(
-      padding: EdgeInsets.all(10.0),
-      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(0.0),
+      margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -233,7 +220,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             "$contenido",
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 30,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.orange),
           ),
@@ -249,9 +236,9 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
 
   Widget _line() {
     return Container(
-      height: 50.0,
-      width: 2.0,
-      color: Colors.grey,
+      height: 30.0,
+      width: 1.5,
+      color: Colors.black12,
     );
   }
 
@@ -259,18 +246,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     return Container(
         child: Column(
       children: <Widget>[
-        Row(children: <Widget>[
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.all(2.0),
-              height: 25.0,
-              child: iconoPanel,
-              decoration: BoxDecoration(
-                color: Colors.orange[300],
-              ),
-            ),
-          )
-        ]),
+        Divider(height: 1,)       ,
         Expanded(
           child: ListView.builder(
               scrollDirection: Axis.vertical,

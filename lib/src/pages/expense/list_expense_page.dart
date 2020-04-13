@@ -97,7 +97,7 @@ class _ListExpensePageState extends State<ListExpensePage> {
         actionExtentRatio: 0.20,
         child: _tarjeta(
             date: DateTime.parse(expense["date"]),
-            value: double.parse(expense["monto"]),
+            value: money(expense["monto"]),
             category: expense["category"],
             expense: expense),
         secondaryActions: <Widget>[
@@ -113,7 +113,7 @@ class _ListExpensePageState extends State<ListExpensePage> {
         ]);
   }
 
-  ListTile _tarjeta({DateTime date, String category, double value, var expense}) {
+  ListTile _tarjeta({DateTime date, String category, String value, var expense}) {
     return ListTile(
       leading: Text(
         "${DateFormat("dd").format(date)}",

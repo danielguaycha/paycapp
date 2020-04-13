@@ -29,7 +29,7 @@ Widget slideableForPyments({
 }) {
   _loader = new ProgressLoader(context);
   _scaffoldKey = scaffoldKey;
-  Color _color = Colors.grey;
+  Color _color = Colors.black54;
   String _state = "Pendiente";
   if (state == "-1") {
     _color = Colors.red;
@@ -46,7 +46,7 @@ Widget slideableForPyments({
     actionPane: SlidableDrawerActionPane(),
     actionExtentRatio: 0.20,
     child: Container(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.symmetric( horizontal: 10.0, vertical: 8),
         child: Row(
           children: <Widget>[
             Expanded(
@@ -58,13 +58,13 @@ Widget slideableForPyments({
                           Text(
                             money(value),
                             style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 color: _color,
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
                             "$date",
-                            style: TextStyle(fontSize: 20, color: _color),
+                            style: TextStyle(fontSize: 15, color: _color),
                           ),
                         ],
                       )
@@ -95,7 +95,7 @@ Widget slideableForPyments({
                   "$_state",
                   textAlign: TextAlign.right,
                   style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, color: _color),
+                      fontSize: 17, fontWeight: FontWeight.w400, color: _color),
                 ),
               ],
             ) :
@@ -112,7 +112,7 @@ Widget slideableForPyments({
                   "$_state",
                   textAlign: TextAlign.right,
                   style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, color: _color),
+                      fontSize: 17, fontWeight: FontWeight.w400, color: _color),
                 ),
               ],
             ),
@@ -121,7 +121,7 @@ Widget slideableForPyments({
     actions: <Widget>[
       IconSlideAction(
         caption: 'Pagar',
-        color: Colors.blue,
+        color: Colors.green,
         icon: Icons.payment,
         onTap: () async {
           // 2 sginfica que esta pagado
@@ -135,7 +135,7 @@ Widget slideableForPyments({
         },
       ),
       IconSlideAction(
-        caption: 'Marcar Mora',
+        caption: 'Mora',
         color: Colors.red,
         icon: Icons.remove_circle_outline,
         onTap: () async {
@@ -157,7 +157,7 @@ Widget slideableForPyments({
 Widget iconSlideActionAnular(idPago, context) {
   return IconSlideAction(
     caption: 'Anular',
-    color: Colors.black38,
+    color: Theme.of(context).primaryColor,
     icon: Icons.delete,
     onTap: () async {
       bool process = await _deleteCredit(int.parse(idPago), context);
