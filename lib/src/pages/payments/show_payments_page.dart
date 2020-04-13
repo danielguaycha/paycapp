@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:paycapp/src/pages/payments/payments_widgets.dart';
+import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
 //Variables
 String _fecha = "";
+String category = 'diario';
+
+final _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class ShowPaymentsPage extends StatefulWidget {
   ShowPaymentsPage({Key key}) : super(key: key);
@@ -14,38 +18,109 @@ class ShowPaymentsPage extends StatefulWidget {
 
 class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
   @override
+  void initState() {
+    _fecha = _currentTime();
+    super.initState();
+  }
+
+  bool _reload = true;
+  @override
   Widget build(BuildContext context) {
     return Container(
         child: Scaffold(
-      appBar: AppBar(
-        title: Text("Cobros"),
-        actions: <Widget>[
-          // action button
-          IconButton(
-            icon: Icon(Icons.calendar_today),
-            onPressed: () async {
-              await _selecionarFecha(context);
-              print("Fecha: $_fecha");
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-          child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[ _boxRoute(contenido: "1")],
-          ),
-          _containerCards(etiqueta: "DIARIOS"),
-          Divider(),
-          _containerCards(etiqueta: "SEMANALES"),
-          Divider(),
-          _containerCards(etiqueta: "QUINCENALES"),
-          Divider(),
-          _containerCards(etiqueta: "MENSUALES"),
-        ],
-      )),
-    ));
+            key: _scaffoldKey,
+            appBar: AppBar(
+              title: Text("Cobros \t | \t $_fecha"),
+              actions: <Widget>[
+                // action button
+                IconButton(
+                  icon: Icon(Icons.calendar_today),
+                  onPressed: () async {
+                    await _selecionarFecha(context);
+                  },
+                ),
+                PopupMenuButton<String>(
+                  onSelected: choiceAction,
+                  itemBuilder: (BuildContext context) {
+                    return choicesForPyments.map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(
+                          choice.toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    }).toList();
+                  },
+                ),
+              ],
+            ),
+            body: FutureBuilder(
+              //lista del servidor
+              future:
+                  CreditProvider().listPaymentsForDay(_fecha),
+
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return renderError(snapshot.error, () {});
+                }
+
+                if (!snapshot.hasData) return loader(text: "Cargando pagos...");
+
+                var results = snapshot.data.data;
+
+                if (results != null && results.length <= 0) {
+                  return renderNotFoundData("No tienes rutas asignadas aún");
+                }
+                print(results[category] == null);
+                _reload = false;
+                return Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[_boxRoute(contenido: "1")],
+                    ),
+                    _lista(results[category], context, _scaffoldKey),
+                  ],
+                );
+              },
+            )));
+  }
+
+  void choiceAction(String choice) {
+    category = choice;
+    _retry();
+  }
+
+  Widget _lista(results, context, scaffoldKey) {
+    if (results.length == 0) {
+      return Expanded(child: renderNotFoundData("No hay cobros de tipo ${category.toUpperCase()} en esta fecha"),);
+    }
+
+    return Expanded(
+        child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: results.length,
+            itemBuilder: (context, index) {
+              print("DATOS: ${results.length}");
+              var payment = results[index];
+              return slideableForPyments(
+                  idPago: payment['id'].toString(),
+                  name: payment['client_name'],
+                  surname: payment['client_surname'],
+                  addres: payment['address'],
+                  state: payment['status'].toString(),
+                  value: payment['total'].toString(),
+                  creditID: payment['credit_id'].toString(),
+                  retry: _retry,
+                  context: context,
+                  scaffoldKey: scaffoldKey,
+                  showDetail: true);
+            }));
+  }
+
+  String _currentTime() {
+    DateTime currentTime = new DateTime.now();
+    return dateTimetoString(currentTime);
   }
 
   _selecionarFecha(BuildContext context) async {
@@ -59,15 +134,12 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
 
     if (picked != null) {
       setState(() {
-        _fecha = picked.year.toString() +
-            "-" +
-            picked.month.toString() +
-            "-" +
-            picked.day.toString();
+        _fecha = dateTimetoString(picked);
+        _reload = true;
       });
     }
   }
-  
+
   Container _boxRoute({String contenido: '', String etiqueta: ''}) {
     return Container(
         padding: EdgeInsets.all(10.0),
@@ -77,7 +149,8 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
             color: Colors.white,
             boxShadow: <BoxShadow>[
               BoxShadow(
-                  color: Colors.grey,)
+                color: Colors.grey,
+              )
             ]),
         child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
@@ -92,151 +165,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
             )));
   }
 
-
-
-  Container _containerCards({String etiqueta: ''}) {
-    return Container(
-        child: Column(
-      children: <Widget>[
-        Row(children: <Widget>[
-          Text(
-            "\t $etiqueta",
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-        ]),
-        _tarjeta(
-            name: "Nixon Quezada",
-            addres: "El Cambio",
-            value: 15.75,
-            state: "Pagado"),
-        Divider(),
-        _tarjeta(
-            name: "Nixon Quezada",
-            addres: "El Cambio",
-            value: 15.75,
-            state: "En mora"),
-        Divider(),
-        _tarjeta(
-            name: "Nixon Quezada",
-            addres: "El Cambio",
-            value: 15.75,
-            state: "Pendiente"),
-      ],
-    ));
-  }
-
-  Slidable _tarjeta({String name, String addres, double value, String state}) {
-    Color _color = Colors.green;
-    if (state == "En mora") {
-      _color = Colors.red;
-    } else if (state == "Pendiente") {
-      _color = Colors.grey;
-    }
-
-    return Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        actionExtentRatio: 0.20,
-        child: Container(
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                    child: Row(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          "$name",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: _color,
-                          ),
-                        ),
-                        Text(
-                          "$addres",
-                          style: TextStyle(fontSize: 20, color: _color),
-                        ),
-                      ],
-                    )
-                  ],
-                )),
-                Expanded(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          money(value),
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: _color,
-                          ),
-                        ),
-                        Text(
-                          "$state",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 20, color: _color),
-                        ),
-                      ],
-                    )
-                  ],
-                )),
-              ],
-            )),
-        actions: <Widget>[
-          IconSlideAction(
-            caption: 'Pagar',
-            color: Colors.blue,
-            icon: Icons.payment,
-            onTap: () async {
-              //bool process = await _deleteCredit(credit['id'], context);
-              //if(process){
-              //  results.removeAt(index);
-              //  setState(() {});
-              //}
-            },
-          ),
-          IconSlideAction(
-            caption: 'Marcar \ncomo mora',
-            color: Colors.red,
-            icon: Icons.remove_circle_outline,
-            onTap: () async {
-              //bool process = await _deleteCredit(credit['id'], context);
-              //if(process){
-              //  results.removeAt(index);
-              //  setState(() {});
-              //}
-            },
-          ),
-        ],
-        secondaryActions: <Widget>[
-          IconSlideAction(
-            caption: 'Anular',
-            color: Colors.black38,
-            icon: Icons.delete,
-            onTap: () async {
-              //bool process = await _deleteCredit(credit['id'], context);
-              //if(process){
-              //  results.removeAt(index);
-              //  setState(() {});
-              //}
-            },
-          ),
-          IconSlideAction(
-            caption: 'Ver detalle',
-            color: Colors.amber,
-            icon: Icons.list,
-            onTap: () async {
-              //bool process = await _deleteCredit(credit['id'], context);
-              //if(process){
-              //  results.removeAt(index);
-              //  setState(() {});
-              //}
-            },
-          ),
-        ]);
+  _retry() {
+    setState(() {});
   }
 }

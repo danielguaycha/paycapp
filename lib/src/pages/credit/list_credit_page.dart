@@ -54,10 +54,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
               print("---------");
             }
             print("Fin Ubicacion");
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MapRoutePage(cliente: _listClients)));
+              Navigator.push(context, MaterialPageRoute( builder: (context) => MapRoutePage(cliente: _listClients)));
             }
           },
       ),
@@ -115,7 +112,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
   }
 
   Slidable _elements(context, credit, results, index) {
-    _listClients.add(new ClientCredit(credit['lat'], credit['lon'], "${credit['name']}  ${credit['surname']}", credit['address'], credit['ruta']));
+    _listClients.add(new ClientCredit(credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], credit['ruta']));
 
     return Slidable(
         actionPane: SlidableDrawerActionPane(),
@@ -151,7 +148,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MapOnlyLocationPage( cliente: new ClientCredit(credit['lat'], credit['lon'], "${credit['name']}  ${credit['surname']}", credit['address'], credit['ruta']))));
+                      builder: (context) => MapOnlyLocationPage( cliente: new ClientCredit(credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], credit['ruta']))));
               },
           ),
         ],

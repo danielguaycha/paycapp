@@ -5,6 +5,7 @@ import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:paycapp/src/models/responser.dart';
+import 'package:paycapp/src/pages/payments/payments_widgets.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
@@ -26,13 +27,13 @@ final _scaffoldKey = GlobalKey<ScaffoldState>();
 // Fin codigo extra
 
 class _ListPaymentsPageState extends State<ListPaymentsPage> {
-  ProgressLoader _loader;
-  TextEditingController _textEditingController = new TextEditingController();
+  // ProgressLoader _loader;
+  // TextEditingController _textEditingController = new TextEditingController();
   String reason = "";
 
   @override
   Widget build(BuildContext context) {
-    _loader = new ProgressLoader(context);
+    // _loader = new ProgressLoader(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -276,120 +277,139 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               itemCount: results['payments'].length,
               itemBuilder: (context, index) {
                 var payment = results['payments'][index];
-                return _tarjeta(
-                    id_pago: "${payment['id']}",
+                
+                return slideableForPyments(
+                    idPago: "${payment['id']}",
                     date: "${payment['date']}",
                     value: "${payment['total']}",
-                    state: "${payment['status']}");
+                    state: "${payment['status']}",
+                    retry: _retry,
+                    context: context,
+                    scaffoldKey: _scaffoldKey,
+                    showDetail: false,
+                );
               }),
+
+              //   return _tarjeta(
+              //       id_pago: "${payment['id']}",
+              //       date: "${payment['date']}",
+              //       value: "${payment['total']}",
+              //       state: "${payment['status']}");
+              // }),
         ),
       ],
     ));
   }
 
-  Slidable _tarjeta({String id_pago, String date, String value, String state}) {
-    Color _color = Colors.grey;
-    String _state = "Pendiente";
-    if (state == "-1") {
-      _color = Colors.red;
-      _state = "En mora";
-    } else if (state == "2") {
-      _color = Colors.green;
-      _state = "Pagado";
-    }
-
-    return Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        actionExtentRatio: 0.20,
-        child: Container(
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                    child: Row(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          money(value),
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: _color,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "$date",
-                          style: TextStyle(fontSize: 20, color: _color),
-                        ),
-                      ],
-                    )
-                  ],
-                )),
-                Expanded(
-                  child: Text(
-                    "$_state",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: _color),
-                  ),
-                ),
-              ],
-            )),
-        actions: <Widget>[
-          IconSlideAction(
-            caption: 'Pagar',
-            color: Colors.blue,
-            icon: Icons.payment,
-            onTap: () async {
-              // 2 sginfica que esta pagado
-              bool process = await _updatePayment(int.parse(id_pago) , 2, context, title: "Realizar pago", content: "¿Está seguro de realizar este pago?");
-              if(process){
-                print("Se pago");
-                setState(() {});
-              }},
-          ),
-          IconSlideAction(
-            caption: 'Marcar \ncomo mora',
-            color: Colors.red,
-            icon: Icons.remove_circle_outline,
-            onTap: () async {
-              // -1 sginfica que estara en mora
-              bool process = await _updatePayment(int.parse(id_pago) , -1, context, title: "Marcar en Mora", content: "¿Está seguro que desea marcar como mora este pago?");
-              if(process){
-                setState(() {                  
-                });
-              }
-            },
-          ),
-        ],
-        secondaryActions: <Widget>[
-          IconSlideAction(
-            caption: 'Anular',
-            color: Colors.black38,
-            icon: Icons.delete,
-            onTap: () async {
-              bool process = await _deleteCredit(int.parse(id_pago), context);
-              // if (process) {
-              //   print("Se elimino el pago por: $reason");
-              //   reason = "";
-              // }
-            },
-          ),
-          // IconSlideAction(
-          //   caption: 'Ver detalle',
-          //   color: Colors.amber,
-          //   icon: Icons.list,
-          //   onTap: () async {
-          //     // bool process = await _showDetail(widget.id, context);
-          //     // if (process) {
-          //     //   print("Detalle de: ${widget.id}");
-          //     // }
-          //   },
-          // ),
-        ]);
+  _retry(){
+    setState(() {
+      
+    });
   }
+
+  // Slidable _tarjeta({String id_pago, String date, String value, String state}) {
+  //   Color _color = Colors.grey;
+  //   String _state = "Pendiente";
+  //   if (state == "-1") {
+  //     _color = Colors.red;
+  //     _state = "En mora";
+  //   } else if (state == "2") {
+  //     _color = Colors.green;
+  //     _state = "Pagado";
+  //   }
+
+  //   return Slidable(
+  //       actionPane: SlidableDrawerActionPane(),
+  //       actionExtentRatio: 0.20,
+  //       child: Container(
+  //           padding: EdgeInsets.all(10.0),
+  //           child: Row(
+  //             children: <Widget>[
+  //               Expanded(
+  //                   child: Row(
+  //                 children: <Widget>[
+  //                   Column(
+  //                     children: <Widget>[
+  //                       Text(
+  //                         money(value),
+  //                         style: TextStyle(
+  //                             fontSize: 20,
+  //                             color: _color,
+  //                             fontWeight: FontWeight.bold),
+  //                       ),
+  //                       Text(
+  //                         "$date",
+  //                         style: TextStyle(fontSize: 20, color: _color),
+  //                       ),
+  //                     ],
+  //                   )
+  //                 ],
+  //               )),
+  //               Expanded(
+  //                 child: Text(
+  //                   "$_state",
+  //                   textAlign: TextAlign.right,
+  //                   style: TextStyle(
+  //                       fontSize: 20,
+  //                       fontWeight: FontWeight.bold,
+  //                       color: _color),
+  //                 ),
+  //               ),
+  //             ],
+  //           )),
+  //       actions: <Widget>[
+  //         IconSlideAction(
+  //           caption: 'Pagar',
+  //           color: Colors.blue,
+  //           icon: Icons.payment,
+  //           onTap: () async {
+  //             // 2 sginfica que esta pagado
+  //             bool process = await _updatePayment(int.parse(id_pago) , 2, context, title: "Realizar pago", content: "¿Está seguro de realizar este pago?");
+  //             if(process){
+  //               print("Se pago");
+  //               setState(() {});
+  //             }},
+  //         ),
+  //         IconSlideAction(
+  //           caption: 'Marcar \ncomo mora',
+  //           color: Colors.red,
+  //           icon: Icons.remove_circle_outline,
+  //           onTap: () async {
+  //             // -1 sginfica que estara en mora
+  //             bool process = await _updatePayment(int.parse(id_pago) , -1, context, title: "Marcar en Mora", content: "¿Está seguro que desea marcar como mora este pago?");
+  //             if(process){
+  //               setState(() {                  
+  //               });
+  //             }
+  //           },
+  //         ),
+  //       ],
+  //       secondaryActions: <Widget>[
+  //         IconSlideAction(
+  //           caption: 'Anular',
+  //           color: Colors.black38,
+  //           icon: Icons.delete,
+  //           onTap: () async {
+  //             bool process = await _deleteCredit(int.parse(id_pago), context);
+  //             // if (process) {
+  //             //   print("Se elimino el pago por: $reason");
+  //             //   reason = "";
+  //             // }
+  //           },
+  //         ),
+  //         IconSlideAction(
+  //           caption: 'Ver detalle',
+  //           color: Colors.amber,
+  //           icon: Icons.list,
+  //           onTap: () async {
+  //             // bool process = await _showDetail(widget.id, context);
+  //             // if (process) {
+  //             //   print("Detalle de: ${widget.id}");
+  //             // }
+  //           },
+  //         ),
+  //       ]);
+  // }
 
   //Redondear
   String redondear(String value, {int decimales = 2}){
@@ -399,81 +419,81 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
 
-  //Actualizar a mora
-  Future<bool> _updatePayment(int id, int status, context, {String title, String content}) async {
-    int isOk = await Alert.confirm(context,
-        title: title,
-        content: content);
-    if (isOk == 1) {
-      return false;
-    }
-    _loader.show(msg: "Actualizando...");
-    Responser res = await CreditProvider().updatePayment(id, status);
-    if(res.ok) { 
-      _scaffoldKey.currentState
-          .showSnackBar(customSnack("Actualizado con exito"));
-    } else {
-      print("ERROR: ${res.message}");     
-      _scaffoldKey.currentState
-          .showSnackBar(customSnack(res.message, type: 'err'));
-    }
-    _loader.hide();
-    return true;
-  }
+  // //Actualizar a mora
+  // Future<bool> _updatePayment(int id, int status, context, {String title, String content}) async {
+  //   int isOk = await Alert.confirm(context,
+  //       title: title,
+  //       content: content);
+  //   if (isOk == 1) {
+  //     return false;
+  //   }
+  //   _loader.show(msg: "Actualizando...");
+  //   Responser res = await CreditProvider().updatePayment(id, status);
+  //   if(res.ok) { 
+  //     _scaffoldKey.currentState
+  //         .showSnackBar(customSnack("Actualizado con exito"));
+  //   } else {
+  //     print("ERROR: ${res.message}");     
+  //     _scaffoldKey.currentState
+  //         .showSnackBar(customSnack(res.message, type: 'err'));
+  //   }
+  //   _loader.hide();
+  //   return true;
+  // }
 
-  // Anular crédito
-  Future<bool> _deleteCredit(creditId, context) async {
-    int isOk = await Alert.confirm(context,
-        title: "Anular Pago",
-        content: "¿Está seguro que desea anular este pago?");
-    if (isOk == 1) {
-      return false;
-    }
-    if (creditId <= 0) {
-      _scaffoldKey.currentState
-          .showSnackBar(customSnack("No se ha podido anular este pago", type: 'err'));
-      return false;
-    }
+  // // Anular crédito
+  // Future<bool> _deleteCredit(creditId, context) async {
+  //   int isOk = await Alert.confirm(context,
+  //       title: "Anular Pago",
+  //       content: "¿Está seguro que desea anular este pago?");
+  //   if (isOk == 1) {
+  //     return false;
+  //   }
+  //   if (creditId <= 0) {
+  //     _scaffoldKey.currentState
+  //         .showSnackBar(customSnack("No se ha podido anular este pago", type: 'err'));
+  //     return false;
+  //   }
     
-    await _displayDialog(context);
-    _loader.show(msg : "Anulando crédito");
-    Responser res = await CreditProvider().deletePayments(creditId, reason);
-    if(res.ok) {
-      _scaffoldKey.currentState.showSnackBar(customSnack("Pago anulado con exito"));
-    } else {
-      _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
-    }
-    _loader.hide();
-    return true;
-  }
+  //   await _displayDialog(context);
+  //   _loader.show(msg : "Anulando crédito");
+  //   Responser res = await CreditProvider().deletePayments(creditId, reason);
+  //   if(res.ok) {
+  //     _scaffoldKey.currentState.showSnackBar(customSnack("Pago anulado con exito"));
+  //   } else {
+  //     _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
+  //   }
+  //   _loader.hide();
+  //   return true;
+  // }
 
-  Future _displayDialog(BuildContext context) async {
-    _textEditingController.text = "";
-    reason = "";
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Ingrese el motivo por el cual va a anular el pago'),
-            content: TextField(
-              controller: _textEditingController,
-              decoration: InputDecoration(hintText: "Motivo"),
-              onChanged: (text) {                
-                reason = text;
-              },
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: Text('Enviar'),
-                onPressed: () {                  
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        }
-    );
-  }
+  // Future _displayDialog(BuildContext context) async {
+  //   _textEditingController.text = "";
+  //   reason = "";
+  //   return showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Text('Ingrese el motivo por el cual va a anular el pago'),
+  //           content: TextField(
+  //             controller: _textEditingController,
+  //             decoration: InputDecoration(hintText: "Motivo"),
+  //             onChanged: (text) {                
+  //               reason = text;
+  //             },
+  //           ),
+  //           actions: <Widget>[
+  //             new FlatButton(
+  //               child: Text('Enviar'),
+  //               onPressed: () {                  
+  //                 Navigator.of(context).pop();
+  //               },
+  //             )
+  //           ],
+  //         );
+  //       }
+  //   );
+  // }
 
 
 

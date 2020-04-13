@@ -77,6 +77,14 @@ class CreditProvider {
     Response res = await _http.get("/payment/$id");
     return Responser.fromJson(res.data);
   }
+  
+  //Listar pagos por dia
+  Future<dynamic> listPaymentsForDay(String date) async {
+    print("Listando pagos...");
+    String url = "/payment?&date="+date;
+    Response res = await _http.get(url);
+    return Responser.fromJson(res.data);
+  }
 
   //Supuestamente esto anula el pago
   Future<dynamic> deletePayments(id, description) async {
