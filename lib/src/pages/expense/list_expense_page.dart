@@ -140,7 +140,7 @@ class _ListExpensePageState extends State<ListExpensePage> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            money(value),
+            value,
             textAlign: TextAlign.right,
             style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),

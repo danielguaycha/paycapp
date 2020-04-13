@@ -17,43 +17,75 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Configuraciones")),
-      body: Container(
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Divider(),
-                _bigCircle(),
-                Divider(),
-                Container(
-                  child: Column(children: <Widget>[
-                    Text("Nombre Apellido"),
-                    Text("UserName")
-                  ],)
-                ),
-                Divider(),
-                Expanded(
-                  child: Container()
-                ),
-                 _botton("Cambiar Contraseña", _changePassword),
-                Divider(),
-                _botton("Cerrar Sesión", _logOut),
-                Expanded(
-                  child: Container()
-                ),
-              ],
-            ),
-          ],
-        ),
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          return orientation == Orientation.portrait ? _portraitView() : _landscapeView();
+        }
+      
       ),
     );
   }
 
+  Widget _portraitView(){
+    return Padding(
+        padding: EdgeInsets.only(right: 10, left: 10, bottom: 10.0, top: 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            _bigCircle(),
+            Divider(color: Colors.transparent),
+            Container(
+                child: Column(
+              children: <Widget>[Text("Nombre Apellido"), Text("UserName")],
+            )),
+            Divider(color: Colors.transparent),
+            _botton("Cambiar Contraseña", _changePassword),
+            Divider(color: Colors.transparent),
+            _botton("Cerrar Sesión", _logOut),
+          ],
+        ),
+      );
+  }
+
+  Widget _landscapeView(){
+    return SingleChildScrollView(
+        // scrollDirection: Axis.horizontal,
+        // scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(right: 10, left: 10, bottom: 10.0, top: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: Column(
+                children: <Widget>[
+                  _bigCircle(),
+                  Text("Nombre Apellido"),
+                  Text("UserName")
+                ],
+              ),
+            ),
+            Divider(color: Colors.transparent),
+            // Container(
+            //     child: Column(
+            //   children: <Widget>[],
+            // )),
+            // Divider(color: Colors.transparent),
+            Expanded(
+              child: Column(
+                children: <Widget>[
+                  _botton("Cambiar Contraseña", _changePassword),
+                  Divider(color: Colors.transparent),
+                  _botton("Cerrar Sesión", _logOut),
+                ],
+              ),
+            ),          ],
+        ),
+      );
+  }
 
   Container _bigCircle() {
     return Container(
@@ -66,15 +98,18 @@ class _UserPageState extends State<UserPage> {
         border: Border.all(color: Colors.transparent),
       ),
       child: Center(
-        child: Icon(Icons.person, color: Colors.white, size: 100.0,),
+        child: Icon(
+          Icons.person,
+          color: Colors.white,
+          size: 100.0,
+        ),
       ),
     );
   }
 
-
   Widget _botton(String text, Function callBack) {
-    return SizedBox(
-      width: 300.0,
+    return SizedBox(      
+      width: double.maxFinite,
       child: RaisedButton(
           child: Text(
             text,
@@ -89,8 +124,9 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  void _changePassword(){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePassword()));
+  void _changePassword() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ChangePassword()));
   }
 
   void _logOut() {

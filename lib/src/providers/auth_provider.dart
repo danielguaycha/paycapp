@@ -32,4 +32,20 @@ class AuthProvider {
 
     return Responser.fromJson(response.data);
   }
+
+  Future<Responser> changePassword(String oldPass, String newPass) async {
+    final authData = {
+      'password': newPass,
+      'password_now': oldPass,
+    };
+
+    try {
+      Response response = await _http.post('/user/password', data: authData);
+      return Responser.fromJson({'data': response.data});
+    } on DioError catch (e) {
+      return Responser.fromJson(processError(e));
+    }
+  }
+
+
 }
