@@ -214,6 +214,11 @@ String getImagen(String imageName) {
 
 String money(value) {
   String text = "0.0";
+
+  if (value is int) {
+    text = "\$ ${(value.toDouble()).toStringAsFixed(2)}";
+  }
+
   if (value is double) {
     text = "\$ ${(value).toStringAsFixed(2)}";
   }

@@ -43,7 +43,7 @@ class _ListExpensePageState extends State<ListExpensePage> {
       floatingActionButton: _addExpense(),
       body: BackdropScaffold(
         stickyFrontLayer: true,
-        headerHeight: heightDevice / 3,
+        // headerHeight: heightDevice / 3,
         title: Text("Lista de gastos"),
         backLayer: _backLayer(),
         frontLayer: _expenseList(),

@@ -59,7 +59,8 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
           },
       ),
       body: BackdropScaffold(
-        headerHeight: heightDevice / 4 ,
+         stickyFrontLayer: true,
+        // headerHeight: heightDevice / 4 ,
         title: _title(),
         backLayer: _backLayer(),
         frontLayer: _creditList(),
@@ -118,7 +119,6 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
         actionPane: SlidableDrawerActionPane(),
         actionExtentRatio: 0.20,
         child: ListTile(
-
           dense: true,
           leading: Icon(FontAwesomeIcons.moneyBillAlt,
               size: 25, color: Theme.of(context).accentColor),
@@ -306,7 +306,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
         padding: EdgeInsets.only(right: 10, left: 10, bottom: 15, top: 10),
         child: SingleChildScrollView(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               _comboPlazo(context),
               _comboCobros(context),

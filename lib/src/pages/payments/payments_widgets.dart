@@ -40,83 +40,92 @@ Widget slideableForPyments({
   }
 
   double fontWeit = 20.0;
-  if("$name - $surname".length > 30 ) fontWeit = 17.0;
+  if ("$name - $surname".length > 30) fontWeit = 17.0;
 
   return Slidable(
     actionPane: SlidableDrawerActionPane(),
     actionExtentRatio: 0.20,
     child: Container(
-        padding: EdgeInsets.symmetric( horizontal: 10.0, vertical: 8),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Row(
-              children: <Widget>[
-                !showDetail
-                    ? Column(
-                        children: <Widget>[
-                          Text(
-                            money(value),
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: _color,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "$date",
-                            style: TextStyle(fontSize: 15, color: _color),
-                          ),
-                        ],
-                      )
-                    : Column(
+        // padding: EdgeInsets.symmetric( horizontal: 10.0, vertical: 8),
+        child: ListTile(
+          title: Row(
+            children: <Widget>[
+          Expanded(
+              child: Row(
+            children: <Widget>[
+              !showDetail
+                  ? Column(
+                      children: <Widget>[
+                        Text(
+                          money(value),
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: _color,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "$date",
+                          style: TextStyle(fontSize: 15, color: _color),
+                        ),
+                      ],
+                    )
+                  : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "$name - $surname",
-                             textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize: fontWeit,
-                                color: _color,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "$addres",
-                             textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: fontWeit, color: _color),
-                          ),
-                        ],
-                      )
-              ],
-            )),
-            !showDetail ?
-            Column(
-              children: <Widget>[
-                Text(
-                  "$_state",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.w400, color: _color),
+                      children: <Widget>[
+                        Text(
+                          "$name - $surname",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: fontWeit,
+                              color: _color,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "$addres",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: fontWeit, color: _color),
+                        ),
+                      ],
+                    )
+            ],
+          )),
+          !showDetail
+              ? Column(
+                  children: <Widget>[
+                    Text(
+                      "$_state",
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: _color),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      money(value),
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: _color),
+                    ),
+                    Text(
+                      "$_state",
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: _color),
+                    ),
+                  ],
                 ),
-              ],
-            ) :
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Text(
-                  money(value),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, color: _color),
-                ),
-                Text(
-                  "$_state",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.w400, color: _color),
-                ),
-              ],
-            ),
-          ],
+        ],
+          ),
+          onLongPress: () { _callBotonsheet(context); },
         )),
     actions: <Widget>[
       IconSlideAction(
@@ -149,9 +158,40 @@ Widget slideableForPyments({
         },
       ),
     ],
-    secondaryActions:
-        showDetail ? twoElements(idPago, context, creditID) : oneElement(idPago, context),
+    secondaryActions: showDetail
+        ? twoElements(idPago, context, creditID)
+        : oneElement(idPago, context),
   );
+}
+
+void _callBotonsheet(context){
+  showModalBottomSheet(context: context, builder: (context){
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
+          leading: Icon(Icons.info),
+          title: Text("Información"),
+          onTap: (){ Navigator.pop(context); print("Esta es una informacion");},
+        ),
+
+        ListTile(
+          leading: Icon(Icons.map),
+          title: Text("Ubicacion"),
+          onTap: (){  Navigator.pop(context); print("Esta es una ubicacion");},
+        ),
+
+        ListTile(
+          leading: Icon(Icons.image),
+          title: Text("Referencia"),
+          onTap: (){ Navigator.pop(context); print("Esta es una imagen de referencia");},
+        ),
+
+
+      ],
+
+    );
+  });
 }
 
 Widget iconSlideActionAnular(idPago, context) {
@@ -172,7 +212,6 @@ List<Widget> oneElement(idPago, context) {
 }
 
 List<Widget> twoElements(idPago, context, creditID) {
-
   List<Widget> list = new List<Widget>();
   list.add(iconSlideActionAnular(idPago, context));
   list.add(
@@ -182,9 +221,10 @@ List<Widget> twoElements(idPago, context, creditID) {
       icon: Icons.list,
       onTap: () async {
         Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ListPaymentsPage(id: int.parse(creditID))));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ListPaymentsPage(id: int.parse(creditID))));
       },
     ),
   );

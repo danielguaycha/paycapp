@@ -98,6 +98,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
 
     return Expanded(
         child: ListView.builder(
+            
             scrollDirection: Axis.vertical,
             itemCount: results.length,
             itemBuilder: (context, index) {
