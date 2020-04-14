@@ -251,3 +251,13 @@ bool isNumeric(String s) {
   }
   return double.tryParse(s) != null;
 }
+
+Widget showImage(String urlImagen){
+    print("IMURL: $urlImagen");
+    // print("Ruta: ${getImagen(urlImagen)}");
+    return FadeInImage.assetNetwork(
+      fadeInCurve: Curves.decelerate,
+      image: getImagen(urlImagen),
+      placeholder: 'assets/loading_circle.gif',
+    );
+  }

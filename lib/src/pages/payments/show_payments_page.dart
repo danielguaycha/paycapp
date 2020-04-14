@@ -98,7 +98,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
 
     return Expanded(
         child: ListView.builder(
-            
+
             scrollDirection: Axis.vertical,
             itemCount: results.length,
             itemBuilder: (context, index) {
@@ -108,10 +108,14 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
                   idPago: payment['id'].toString(),
                   name: payment['client_name'],
                   surname: payment['client_surname'],
-                  addres: payment['address'],
+                  address: payment['address'],
                   state: payment['status'].toString(),
                   value: payment['total'].toString(),
                   creditID: payment['credit_id'].toString(),
+                  refDetail: payment['ref_detail'],
+                  refImage: payment['ref_img'].toString(),
+                  lat: payment['lat'].toString(),
+                  lon: payment['lon'].toString(),
                   retry: _retry,
                   context: context,
                   scaffoldKey: scaffoldKey,

@@ -1,12 +1,14 @@
 import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:paycapp/src/models/clientCredit_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
+import '../map_only_location_page.dart';
 import 'list_payments_page.dart';
 
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -20,8 +22,12 @@ Widget slideableForPyments({
   String state,
   String name,
   String surname,
-  String addres,
+  String address,
   String creditID,
+  String refDetail,
+  String refImage,
+  String lat, 
+  String lon,
   @required Function retry,
   @required context,
   @required scaffoldKey,
@@ -40,6 +46,7 @@ Widget slideableForPyments({
   }
 
   double fontWeit = 20.0;
+  if ("$name - $surname".length > 25) fontWeit = 18.0;
   if ("$name - $surname".length > 30) fontWeit = 17.0;
 
   return Slidable(
@@ -48,8 +55,8 @@ Widget slideableForPyments({
     child: Container(
         // padding: EdgeInsets.symmetric( horizontal: 10.0, vertical: 8),
         child: ListTile(
-          title: Row(
-            children: <Widget>[
+      title: Row(
+        children: <Widget>[
           Expanded(
               child: Row(
             children: <Widget>[
@@ -80,11 +87,11 @@ Widget slideableForPyments({
                               color: _color,
                               fontWeight: FontWeight.bold),
                         ),
-                        Text(
-                          "$addres",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: fontWeit, color: _color),
-                        ),
+                        // Text(
+                        //   "$addres",
+                        //   textAlign: TextAlign.left,
+                        //   style: TextStyle(fontSize: fontWeit, color: _color),
+                        // ),
                       ],
                     )
             ],
@@ -124,9 +131,11 @@ Widget slideableForPyments({
                   ],
                 ),
         ],
-          ),
-          onLongPress: () { _callBotonsheet(context); },
-        )),
+      ),
+      onLongPress: () {
+        _callModalBotonsheet(context, textInfo: address, urlImage: refImage, refDetail: refDetail ,lat: lat, lon: lon, name: name, surname: surname, address: address);
+      },
+    )),
     actions: <Widget>[
       IconSlideAction(
         caption: 'Pagar',
@@ -164,34 +173,40 @@ Widget slideableForPyments({
   );
 }
 
-void _callBotonsheet(context){
-  showModalBottomSheet(context: context, builder: (context){
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ListTile(
-          leading: Icon(Icons.info),
-          title: Text("Información"),
-          onTap: (){ Navigator.pop(context); print("Esta es una informacion");},
-        ),
-
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text("Ubicacion"),
-          onTap: (){  Navigator.pop(context); print("Esta es una ubicacion");},
-        ),
-
-        ListTile(
-          leading: Icon(Icons.image),
-          title: Text("Referencia"),
-          onTap: (){ Navigator.pop(context); print("Esta es una imagen de referencia");},
-        ),
-
-
-      ],
-
-    );
-  });
+void _callModalBotonsheet(context, {String textInfo, String urlImage, String refDetail, String lat, String lon, String name, String surname, String address}) {
+  showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.info),
+              title: Text("Información"),
+              onTap: () {
+                Navigator.pop(context);
+                _displayText(context, text: textInfo);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.map),
+              title: Text("Ubicacion"),
+              onTap: () {
+                Navigator.pop(context);
+                gotToMap(context, lat, lon, "$name $surname", address);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.image),
+              title: Text("Referencia"),
+              onTap: () {
+                Navigator.pop(context);
+                _displayImage(context, url: urlImage, refDetail: refDetail);
+              },
+            ),
+          ],
+        );
+      });
 }
 
 Widget iconSlideActionAnular(idPago, context) {
@@ -305,4 +320,53 @@ Future _displayDialog(BuildContext context) async {
           ],
         );
       });
+}
+
+Future _displayText(BuildContext context, {@required String text}) async {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Dirección', style: TextStyle(fontWeight: FontWeight.bold),),
+        content: Text(text),
+        actions: <Widget>[
+          new FlatButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      );
+    },
+  );
+}
+
+Future _displayImage(BuildContext context, {@required String url, String refDetail}) async {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Referencia', style: TextStyle(fontWeight: FontWeight.bold),),
+        content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[showImage(url), Text(refDetail)],),
+        actions: <Widget>[
+          new FlatButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      );
+    },
+  );
+}
+
+void gotToMap(context, String lat, String lon, String name, String address){
+  
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MapOnlyLocationPage(
+        cliente: new ClientCredit(lat, lon, name, address, ""))));
 }

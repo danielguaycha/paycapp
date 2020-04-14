@@ -1,16 +1,8 @@
-import 'dart:ffi';
-import 'dart:math';
-
-import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:paycapp/src/models/responser.dart';
+
 import 'package:paycapp/src/pages/payments/payments_widgets.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
-import 'package:paycapp/src/utils/messages_util.dart';
-import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class ListPaymentsPage extends StatefulWidget {
   final int id;
@@ -387,13 +379,6 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //       ]);
   // }
 
-  //Redondear
-  String redondear(String value, {int decimales = 2}){
-    double d = double.parse(value);    
-    String dato = (d).toStringAsFixed(decimales);
-    return dato;
-  }
-
 
   // //Actualizar a mora
   // Future<bool> _updatePayment(int id, int status, context, {String title, String content}) async {
@@ -470,7 +455,4 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //       }
   //   );
   // }
-
-
-
 }

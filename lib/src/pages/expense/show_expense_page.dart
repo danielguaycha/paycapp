@@ -46,7 +46,7 @@ class _ShowExpensePageState extends State<ShowExpensePage> {
               _field(text: widget.expenseValue["name"].toString().toUpperCase(), labeltext: 'Nombre', icon: Icons.person),
               SizedBox(height: 2),
               _imagen == "null" ? Container() : _photosBtn(),
-              _loadImagen ? _showImage(widget.expenseValue["image"].toString()) : Divider(),
+              _loadImagen ? showImage(widget.expenseValue["image"].toString()) : Divider(),
             ],
           ),
         ));
@@ -80,17 +80,6 @@ class _ShowExpensePageState extends State<ShowExpensePage> {
             },
               ),
             ],
-    );
-  }
-
-
-  Widget _showImage(String imagen){
-    print("IMURL: $imagen");
-    print("Ruta: ${getImagen(imagen)}");
-    return FadeInImage.assetNetwork(
-      fadeInCurve: Curves.decelerate,
-      image: getImagen(imagen),
-      placeholder: 'assets/loading_circle.gif',
     );
   }
 
