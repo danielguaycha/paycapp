@@ -8,6 +8,7 @@ import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
+import '../../config.dart';
 import '../map_only_location_page.dart';
 import 'list_payments_page.dart';
 
@@ -26,7 +27,7 @@ Widget slideableForPyments({
   String creditID,
   String refDetail,
   String refImage,
-  String lat, 
+  String lat,
   String lon,
   @required Function retry,
   @required context,
@@ -133,7 +134,15 @@ Widget slideableForPyments({
         ],
       ),
       onLongPress: () {
-        _callModalBotonsheet(context, textInfo: address, urlImage: refImage, refDetail: refDetail ,lat: lat, lon: lon, name: name, surname: surname, address: address);
+        _callModalBotonsheet(context,
+            textInfo: address,
+            urlImage: refImage,
+            refDetail: refDetail,
+            lat: lat,
+            lon: lon,
+            name: name,
+            surname: surname,
+            address: address);
       },
     )),
     actions: <Widget>[
@@ -173,7 +182,15 @@ Widget slideableForPyments({
   );
 }
 
-void _callModalBotonsheet(context, {String textInfo, String urlImage, String refDetail, String lat, String lon, String name, String surname, String address}) {
+void _callModalBotonsheet(context,
+    {String textInfo,
+    String urlImage,
+    String refDetail,
+    String lat,
+    String lon,
+    String name,
+    String surname,
+    String address}) {
   showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -327,28 +344,42 @@ Future _displayText(BuildContext context, {@required String text}) async {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Dirección', style: TextStyle(fontWeight: FontWeight.bold),),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        title: Text(
+          'Dirección',
+          textAlign: TextAlign.center,
+        ),
         content: Text(text),
         actions: <Widget>[
-          new FlatButton(
+          FlatButton(
             child: Text('OK'),
             onPressed: () {
               Navigator.of(context).pop();
             },
-          )
+          ),
         ],
       );
     },
   );
 }
 
-Future _displayImage(BuildContext context, {@required String url, String refDetail}) async {
+Future _displayImage(BuildContext context,
+    {@required String url, String refDetail}) async {
   return showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Referencia', style: TextStyle(fontWeight: FontWeight.bold),),
-        content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[showImage(url), Text(refDetail)],),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        title: Text(
+          'Referencia',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[showImage(url), Text(refDetail)],
+        ),
         actions: <Widget>[
           new FlatButton(
             child: Text('OK'),
@@ -362,11 +393,10 @@ Future _displayImage(BuildContext context, {@required String url, String refDeta
   );
 }
 
-void gotToMap(context, String lat, String lon, String name, String address){
-  
+void gotToMap(context, String lat, String lon, String name, String address) {
   Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => MapOnlyLocationPage(
-        cliente: new ClientCredit(lat, lon, name, address, ""))));
+      context,
+      MaterialPageRoute(
+          builder: (context) => MapOnlyLocationPage(
+              cliente: new ClientCredit(lat, lon, name, address, ""))));
 }
