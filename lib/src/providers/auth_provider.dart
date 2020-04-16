@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
+import 'package:paycapp/src/models/auth_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/models/user_model.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
@@ -31,6 +35,12 @@ class AuthProvider {
     }
 
     return Responser.fromJson(response.data);
+  }
+
+
+  Future<Auth> getCompleteAuth() async {
+      Response response = await _http.get('/user', options: buildCacheOptions(Duration(days: 1)));
+      return Auth.fromJson(json.encode(response.data['data']));
   }
 
   Future<Responser> changePassword(String oldPass, String newPass) async {

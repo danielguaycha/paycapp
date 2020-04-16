@@ -67,20 +67,22 @@ class _AddClientPageState extends State<AddClientPage> {
 
   /*Send Form for register client*/
 
-  void onSubmitClient(context) async{
+  void onSubmitClient(context) async {
     setState(() => _msg = '');
+    Person p;
     _loader.show(msg: 'Guardando cliente, espere...');
     Responser res = await _clientProvider.store(_client);
-    if(res.ok) {  
+    if(res.ok) {
+      p = Person.fromJson(res.data);
       final _prefs = LocalStorage();
-      _prefs.person = Person.fromJson(res.data);
-      Navigator.of(context).pop();
+      _prefs.person = p;
     } else {
      setState(() {
        _msg = res.message;
      });
     }
     _loader.hide();
+    Navigator.pop(context, p);
   }
 
   /*--------------------- fields ---------------------*/

@@ -30,6 +30,7 @@ class Credit {
   double totalUtilidad;
   double total;
   double pagosDe;
+  double pagosDeLast;
   String description;
   String prendaDetail;
   File prendaImg;
@@ -55,6 +56,7 @@ class Credit {
     this.totalUtilidad = 0,
     this.total = 0,
     this.pagosDe = 0,
+    this.pagosDeLast = 0,
     this.description,
     this.npagos = 0,
     this.prendaDetail,
@@ -75,6 +77,7 @@ class Credit {
     totalUtilidad: json["total_utilidad"].toDouble(),
     total: json["total"].toDouble(),
     pagosDe: json["pagos_de"].toDouble(),
+    pagosDeLast: json["pagos_de_last"].toDouble(),
     description: json["description"],
     id: json["id"],
   );
@@ -94,6 +97,7 @@ class Credit {
     "total_utilidad": totalUtilidad,
     "total": total,
     "pagos_de": pagosDe,
+    "pagos_de_last": pagosDeLast,
     "description": description,
     "prenda_detail": prendaDetail,
     "id": id,
@@ -133,7 +137,6 @@ class Credit {
   calcular() {
     if(monto <= 0 )
       return;
-
     totalUtilidad = monto * (utilidad/100);
     total = monto + totalUtilidad;
 
@@ -141,7 +144,37 @@ class Credit {
       return;
 
     npagos = (diasPlazo() / diasCobro()).toInt();
-    pagosDe = (total / npagos);
+    pagosDe = (total / npagos).roundToDouble();
+    print("#pagos $npagos | Cuotas: $pagosDe");
+    double totalIdeal = pagosDe * npagos;
+    print("total $total == $totalIdeal");
+    if(totalIdeal != total) {
+      if (totalIdeal < total) {
+        double diferencia = total - totalIdeal;
+        pagosDeLast = pagosDe + diferencia;
+      }
+    }
 
   }
 }
+/*
+        $c->total_utilidad = ($c->monto * ($c->utilidad/100)); // utilidad
+        $c->total = $c->monto + $c->total_utilidad; // total con utilidad
+
+        $diasPlazo = Credit::diasPlazo($plazo);
+        $diasCobro = Credit::diasCobro($cobro);
+        $numPagos = intval($diasPlazo / $diasCobro );
+        $numPagosReal = $numPagos;
+
+        $pagosDe = round($mount / $numPagos, 2);
+        $pagosDeLast = 0;
+        $totalIdeal = $pagosDe * $numPagos;
+
+        if($totalIdeal !== $mount) {
+            if($totalIdeal < $mount) {
+                $diferencia = $mount - $totalIdeal;
+                $pagosDeLast = round($pagosDe + $diferencia, 2);
+                $numPagos--;
+            }
+        }
+ */

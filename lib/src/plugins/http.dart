@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:paycapp/main.dart';
 import 'package:paycapp/src/config.dart' show urlApi;
 import 'package:paycapp/src/utils/local_storage.dart';
@@ -8,6 +9,7 @@ class HttpClient {
 
   Dio dio;
   final NavigationService _navigationService = locator<NavigationService>();
+
 
   HttpClient() {
     dio = new Dio(new BaseOptions(
@@ -38,5 +40,6 @@ class HttpClient {
           return e;//continue
         }
     ));
+    dio.interceptors.add(DioCacheManager(CacheConfig(baseUrl: urlApi)).interceptor);
   }
 }
