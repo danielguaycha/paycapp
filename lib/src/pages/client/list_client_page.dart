@@ -49,7 +49,7 @@ class _ListClientState extends State<ListClient> {
         title: !isSearching
             ? Text('Clientes')
             : TextField(
-                onSubmitted: (v) {},
+                autofocus: true,
                 onChanged: (value) {
 
                   valueTosearch = value;
@@ -105,7 +105,7 @@ class _ListClientState extends State<ListClient> {
         var results = snapshot.data.data;
 
         if (results != null && results.length <= 0) {
-          return renderNotFoundData("No hay creditos para mostrar");
+          return renderNotFoundData("No hay coincidencias para mostrar");
         }
 
         return ListView.separated(

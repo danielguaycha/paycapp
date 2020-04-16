@@ -40,24 +40,24 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     //CreditProvider().getlist();
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-          label: Text("Ver en mapa", style: TextStyle(color: Colors.white),),
-          icon: Icon(Icons.location_on, color: Colors.white,),
-          onPressed: () {
-            if(_listClients.length <= 0 ){
-              print("No hay nada para mostrar");
-            }else{
-            print("Inicio Ubicacion ${_listClients.length}");
-            for (var x in _listClients){
-              print(x.lat);
-              print(x.lng);
-              print("---------");
-            }
-            print("Fin Ubicacion");
-              Navigator.push(context, MaterialPageRoute( builder: (context) => MapRoutePage(cliente: _listClients)));
-            }
-          },
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //     label: Text("Ver en mapa", style: TextStyle(color: Colors.white),),
+      //     icon: Icon(Icons.location_on, color: Colors.white,),
+      //     onPressed: () {
+      //       if(_listClients.length <= 0 ){
+      //         print("No hay nada para mostrar");
+      //       }else{
+      //       print("Inicio Ubicacion ${_listClients.length}");
+      //       for (var x in _listClients){
+      //         print(x.lat);
+      //         print(x.lng);
+      //         print("---------");
+      //       }
+      //       print("Fin Ubicacion");
+      //         Navigator.push(context, MaterialPageRoute( builder: (context) => MapRoutePage(cliente: _listClients)));
+      //       }
+      //     },
+      // ),
       body: BackdropScaffold(
          stickyFrontLayer: true,
         // headerHeight: heightDevice / 4 ,
