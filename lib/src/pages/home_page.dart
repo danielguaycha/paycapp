@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     setState(() {
       _currentIndex = index;
       _pageController.animateToPage(index,
-          duration: Duration(milliseconds: 100), curve: Curves.decelerate);
+          duration: Duration(milliseconds: 10), curve: Curves.decelerate);
     });
   }
 }

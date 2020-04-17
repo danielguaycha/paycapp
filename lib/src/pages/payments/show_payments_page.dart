@@ -177,13 +177,13 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
             itemBuilder: (context, index) {
               print("DATOS: ${results.length}");
               var payment = results[index];
-              
+              print("LISTA: $index");
               _paymentsClients.add(new ClientCredit(payment['lat'].toString(), payment['lon'].toString(), "${payment['client_name']}  ${payment['client_surname']} ", payment['address'], null, payment: true, cobro: payment['cobro'], status: payment['status']));
-              BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(devicePixelRatio: 2.5), 
-          'assets/img/pin/${payment['cobro'].toLowerCase()}/${_getStatus(payment['status'])}.png').then((onValue) {
-            _paymentsClients[index].bitmapDescriptor = onValue;
-          });
+          //     BitmapDescriptor.fromAssetImage(
+          // ImageConfiguration(devicePixelRatio: 2.5), 
+          // 'assets/img/pin/${payment['cobro'].toLowerCase()}/${_getStatus(payment['status'])}.png').then((onValue) {
+          //   _paymentsClients[index].bitmapDescriptor = onValue;
+          // });
 
               return slideableForPyments(
                   idPago: payment['id'].toString(),
