@@ -14,6 +14,10 @@ class MapRoutePage extends StatefulWidget {
 
 bool loadData = true;
 List<ClientCredit> f = new List<ClientCredit>();
+final double _yellow = 45.0;
+final double _green = 75.0;
+final double _reed = BitmapDescriptor.hueRed;
+
 //Datos del cliente
 String name = "";
 String addres = "";
@@ -22,22 +26,25 @@ class _MapRoutePageState extends State<MapRoutePage> {
   @override
   void initState() {
     // TODO: implement initState
-     if (loadData) {
-      f = widget.cliente;
-      loadData = false;
-    }
-    print("TEXTO");
-   super.initState();
+    super.initState();
+    // if (loadData) {
+      // f = widget.cliente;
+      // print("INI ESTATE: ${f.length}");
+    //   loadData = false;
+    // }
+    // print("TEXTO");
   }
 
   @override
   Widget build(BuildContext context) {
-    if (loadData) {
-      f = widget.cliente;
-      loadData = false;
-    }
+    // if (loadData) {
+    //   f = widget.cliente;
+    //   loadData = false;
+    // }
+    //   print("build ESTATE: ${f.length}");
+    // // widget.cliente.clear();
+    //   print("build ESTATE 2: ${f.length}");
 
-    widget.cliente.clear();
     return Scaffold(
       appBar: AppBar(
           title: Text('Visualizar rutas'),
@@ -69,7 +76,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
               ],
             );
           }
-
+    // print("befores to send ESTATE: ${f.length}");
           return _map(snapshot.data, widget.cliente, context);
         },
       ),
@@ -89,26 +96,28 @@ class _MapRoutePageState extends State<MapRoutePage> {
   double _position = -100;
 
   Widget _map(data, List<ClientCredit> listaClientes, context) {
+
     LatLng _locationClient;
 
     _currentCoridinates = LatLng(data.latitude, data.longitude);
-    
+
     _initialCameraPosition = CameraPosition(
         target:
             LatLng(_currentCoridinates.latitude, _currentCoridinates.longitude),
         zoom: _zoomForMap);
-    
+
     _markers.add(new Marker(
+      onTap: () => _hideCard(),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       position: _currentCoridinates,
       markerId: MarkerId('$_currentCoridinates'),
       infoWindow: InfoWindow(title: "Tu ubicación"),
     ));
-    
-    print("${listaClientes.length}");
-    
+
+    // print("LISTA: ${listaClientes.length}");
+
     for (var item in listaClientes) {
-      print("HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      // print("HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
       _locationClient = LatLng(double.parse(item.lat), double.parse(item.lng));
       _markers.add(new Marker(
         onTap: () {
@@ -125,17 +134,38 @@ class _MapRoutePageState extends State<MapRoutePage> {
         // infoWindow: InfoWindow(title: "${item.name}", snippet: "${item.address}"),
       ));
     }
+    widget.cliente.clear();
+
+    // double mapp = 0.000000;
+    // for (double i = 0.0; i < 360; i++) {
+    //   mapp = mapp + 0.00008;
+    //   _markers.add(new Marker(
+    //     onTap: () {
+    //       // Cuando se hace clic en un pin se cargan los datos que la tarjeta va a tener
+    //       // _position = double.minPositive;
+    //       // name = item.name;
+    //       // addres = item.address;
+    //       // _retry();
+    //     },
+    //     icon: BitmapDescriptor.defaultMarkerWithHue(i),
+    //     draggable: false,
+    //     position: LatLng(-3.293596, -79.905400 + mapp),
+    //     markerId: MarkerId('$i'),
+    //     infoWindow: InfoWindow(
+    //       title: "$i",
+    //     ),
+    //   ));
+    // }
+
     // esta solucion temporal es para recargar la vista porque da problemas
-    if (loadData) {
-      _retry();
-    }
+    // if (loadData) {
+    //   _retry();
+    // }
     return Stack(
       children: <Widget>[
         GoogleMap(
           onTap: (v) {
-            //Con esta opcion oculto la tarjeta cuando se aplaste fuera del pin
-            _position = -100;
-            _retry();
+            _hideCard();
           },
           compassEnabled: false,
           initialCameraPosition: _initialCameraPosition,
@@ -148,135 +178,91 @@ class _MapRoutePageState extends State<MapRoutePage> {
     );
   }
 
+  void _hideCard() {
+    //Con esta opcion oculto la tarjeta cuando se aplaste fuera del pin
+    _position = -100;
+    _retry();
+  }
+
   void _retry() {
     setState(() {});
   }
 
   // Este metodo retorna el color del pin dependiendo su estatus
   BitmapDescriptor _getBitmapDescriptor(int status) {
-    print("STATUS: $status");
+    // print("STATUS: $status");
     switch (status) {
       case 1:
-        return BitmapDescriptor.defaultMarkerWithHue(55.0);
+        return BitmapDescriptor.defaultMarkerWithHue(_yellow);
         break;
       case 2:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+        return BitmapDescriptor.defaultMarkerWithHue(_green);
         break;
       case -1:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+        return BitmapDescriptor.defaultMarkerWithHue(_reed);
         break;
       default:
-        return BitmapDescriptor.defaultMarkerWithHue(55.0);
+        return BitmapDescriptor.defaultMarkerWithHue(_yellow);
         break;
     }
   }
 
   // Este widget se posiciona por la parte superior y al cambiar sus dimensiones desaparece con una animacion
   // Los valores que carga son name y addres declarados al inicio y cambian sus botones en base al pin seleccionado
-  Widget _tarjetaFlotante(){
+  Widget _tarjetaFlotante() {
     return AnimatedPositioned(
-            top: _position,
-            right: 0,
-            left: 0,
-            duration: Duration(milliseconds: 200),
-            child: Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    margin: EdgeInsets.all(20),
-                    height: 70,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(50)),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                              blurRadius: 20,
-                              offset: Offset.zero,
-                              color: Colors.grey.withOpacity(0.5))
-                        ]),
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(left: 10),
-                              width: 50,
-                              height: 50,
-                              child: ClipOval(
-                                child: Icon(Icons.person_pin),
-                              )),
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    name,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(addres,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.grey)),
-                                ],
+        top: _position,
+        right: 0,
+        left: 0,
+        duration: Duration(milliseconds: 200),
+        child: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+                margin: EdgeInsets.all(20),
+                height: 70,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                          blurRadius: 20,
+                          offset: Offset.zero,
+                          color: Colors.grey.withOpacity(0.5))
+                    ]),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                          margin: EdgeInsets.only(left: 10),
+                          width: 50,
+                          height: 50,
+                          child: ClipOval(
+
+                            child: Icon(Icons.person_pin, color: Colors.green,),
+                          )),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(left: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                name,
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                            ),
+                              Text(addres,
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey)),
+                            ],
                           ),
-                        ]))));
-      
+                        ),
+                      ),
+                    ]))));
   }
-
-  // _verNombre(context, String name){
-  // showAlertDialog(BuildContext context, String name) {
-  //   // set up the button
-  //   Widget okButton = FlatButton(
-  //     child: Text("OK"),
-  //     onPressed: () {},
-  //   );
-  //   // set up the AlertDialog
-  //   AlertDialog alert = AlertDialog(
-  //     title: Text("$name"),
-  //     content: Text("Aqui pondre la direccion"),
-  //     actions: [
-  //       okButton,
-  //     ],
-  //   );
-  //   // show the dialog
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return alert;
-  //     },
-  //   );
-  // }
-
-  // void _callModalBotonsheet(context, {String name}) {
-  //   showModalBottomSheet(
-  //       // shape: StadiumBorder(),
-  //       // elevation: 0.0,
-  //       // barrierColor: Colors.black12,
-  //       // enableDrag: false,
-  //       // isDismissible: true,
-  //       // isScrollControlled: false,
-  //       // useRootNavigator: false,
-  //       // clipBehavior: Clip.antiAlias,
-  //       // backgroundColor: Colors.transparent,
-  //       context: context,
-  //       builder: (context) {
-  //         return Container(
-  //           child: Text(name.toUpperCase()),
-  //         );
-  //       });
-  // }
 }
-// showDialog(context){
-//   AlertDialog f = AlertDialog(
-//   title: Text("name"),
-// );
-// return f;
-// }
-
+ 
 // import 'dart:async';
 // import 'dart:typed_data';
 // import 'dart:ui';
