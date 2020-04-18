@@ -31,6 +31,32 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
   String _reason = "";
 
   ProgressLoader _loader;
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _controller = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 100), value: 1.0);
+    super.initState();
+  }
+
+  bool get isBackPanelVisible {
+    final AnimationStatus status = _controller.status;
+    return status == AnimationStatus.dismissed ||
+        status == AnimationStatus.reverse;
+  }
+
+  void showFrontLayer() {
+    if (isBackPanelVisible) _controller.fling(velocity: 1.0);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     double heightDevice = MediaQuery.of(context).size.height;
@@ -60,9 +86,10 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
       // ),
       body: BackdropScaffold(
          stickyFrontLayer: true,
-        // headerHeight: heightDevice / 4 ,
+        // headerHeight: heightDevice / 4 ,}
+        controller: _controller,
         title: _title(),
-        backLayer: _backLayer(),
+        backLayer: _backLayer(context),
         frontLayer: _creditList(),
         iconPosition: BackdropIconPosition.action,
         frontLayerBorderRadius: BorderRadius.only(
@@ -297,7 +324,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     );
   }
 
-  Widget _backLayer() {
+  Widget _backLayer(context) {
     return Card(      
       elevation: 0.0,
       color: Colors.transparent,
@@ -320,6 +347,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
                   _listClients.clear();
                   _actualizar = true;
                   _retry();
+                  showFrontLayer();
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

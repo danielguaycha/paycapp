@@ -1,8 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:paycapp/src/brain.dart';
+import 'package:paycapp/src/models/auth_model.dart';
 import 'package:paycapp/src/pages/user/change_password_page.dart';
+import 'package:paycapp/src/plugins/http.dart';
+import 'package:paycapp/src/providers/auth_provider.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
 
 import '../../config.dart';
 
@@ -129,8 +135,9 @@ class _UserPageState extends State<UserPage> {
         context, MaterialPageRoute(builder: (context) => ChangePassword()));
   }
 
-  void _logOut() {
+  void _logOut() async {
     _prefs.token = null;
+    HttpClient().clearCachePrimary('/user');
     Navigator.pushReplacementNamed(context, 'login');
   }
 }

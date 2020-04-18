@@ -1,11 +1,13 @@
 import 'dart:io';
-
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:paycapp/src/config.dart' show urlApi;
 import 'package:paycapp/src/config.dart' show debug;
-
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 // Loader Component
 Widget loader({String text = 'Cargando...'}) {
   return Center(
@@ -16,6 +18,18 @@ Widget loader({String text = 'Cargando...'}) {
         CircularProgressIndicator(),
         SizedBox(height: 10),
         Text(text)
+      ],
+    ),
+  );
+}
+
+Widget miniLoader() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 20.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        SizedBox(child: CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.black12)), height: 25, width: 25)
       ],
     ),
   );
@@ -260,4 +274,30 @@ Widget showImage(String urlImagen){
       image: getImagen(urlImagen),
       placeholder: 'assets/img/pin/diario/pendiente.png', //load.gif',
     );
+  }
+
+//* Comprimidor de imagenes
+Future<File> compressImg(File file) async {
+
+    if(file == null) return null;
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+
+    String name = basename(file.path);
+    String fileName = 'compress-'+name.split('.')[0];
+    String ext = name.split('.').last;
+    
+    String finalPath = appDocPath+'/'+fileName+'.'+ext;
+    
+    if(File(finalPath).existsSync()) {
+      return File(finalPath);
+    }
+
+    var result = await FlutterImageCompress.compressAndGetFile(
+        file.absolute.path, finalPath,
+        quality: 88
+    );    
+    
+    return result;
   }

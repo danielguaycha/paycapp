@@ -771,7 +771,7 @@ class _AddCreditPageState extends State<AddCreditPage> {
     var result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path, finalPath,
         quality: 88
-      );    
+    );    
     print(file.lengthSync());
     print(result.lengthSync());
     return result;

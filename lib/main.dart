@@ -15,19 +15,28 @@ import 'package:paycapp/src/utils/navigator.service.dart';
 //Para el manejo de idiomas de la app
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+import 'package:redux_logging/redux_logging.dart';
 
 GetIt locator = GetIt.instance;
 
 void main() async {
-  final  store = new Store<AppState>(reducer, initialState: new AppState(user: null));
+  final store = Store<AppState>(
+      reducer,
+      initialState: new AppState(user: null),
+      middleware: [thunkMiddleware, new LoggingMiddleware.printer()],
+      //middleware: [thunkMiddleware]
+  );
   WidgetsFlutterBinding.ensureInitialized();
 
   await LocalStorage().initPrefs();
   locator.registerLazySingleton(() => NavigationService());
 
-  runApp(new AlertProvider(
-    child: new MyApp(store: store),
-    config: new AlertConfig(ok: "SI", cancel: "CANCELAR", useIosStyle: false),
+  runApp(
+      StoreProvider(store: store, child: new AlertProvider(
+        child: new MyApp(store: store),
+        config: new AlertConfig(ok: "SI", cancel: "CANCELAR", useIosStyle: false),
+      )
   ));
 }
 
@@ -53,9 +62,7 @@ class _MyAppState extends State<MyApp> {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: colors['primaryDark']));
 
-    return StoreProvider<AppState> (
-      store: widget.store,
-      child: MaterialApp(
+    return MaterialApp(
         title: appName,
         debugShowCheckedModeBanner: false,
         navigatorKey: locator<NavigationService>().navigatorKey,
@@ -86,20 +93,22 @@ class _MyAppState extends State<MyApp> {
               elevation: 5,
               textTheme: TextTheme(title: TextStyle(fontSize: 16.5))),
         ),
-        home: (_prefs.token != null) ? HomePage() : LoginPage(),
+        home: (_prefs.token != null) ?
+          HomePage() :
+          LoginPage(),
         // initialRoute: 'login',
         routes: getAppRoutes(),
-      ),
     );
   }
 
   _initUser() async{
+    if(_prefs.token == null) return;
+
     try{
       Auth auth = await AuthProvider().getCompleteAuth();
       widget.store.dispatch(new AddUserAction(auth));
     } catch(e) {
       print(e);
-      print("Error in dispatc auth user in store");
     }
   }
 }

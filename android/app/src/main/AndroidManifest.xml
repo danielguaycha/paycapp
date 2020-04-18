@@ -13,7 +13,7 @@
         android:label="PayApp"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-                   android:value="AIzaSyB1kYILfOGoZfKBE4pAqubxdr1YE-KWP2M"/>
+                   android:value="AIzaSyAdoB5hIORuaqfcPStZX8r61NCu2vV7xwE"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

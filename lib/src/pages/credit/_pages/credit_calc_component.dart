@@ -6,20 +6,23 @@ import 'package:paycapp/src/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 class CreditCalcComponent extends StatefulWidget {
-  final Credit credit;
   CreditCalcComponent({Key key, this.credit}) : super(key: key);
+
+  final Credit credit;
+
   @override
   _CreditCalcComponentState createState() => _CreditCalcComponentState();
 }
 
 class _CreditCalcComponentState extends State<CreditCalcComponent> {
-
-  Credit _credit;
-  FocusNode _node = new FocusNode();
-  FocusNode _inputMonto = new FocusNode();
   DateFormat formatter = new DateFormat('yyyy-MM-dd');
+
   TextEditingController _controller = TextEditingController();
+  Credit _credit;
+  FocusNode _inputMonto = new FocusNode();
+  FocusNode _node = new FocusNode();
   TextEditingController _txtDate = new TextEditingController();
+
   @override
   void initState() {
     _credit = widget.credit;
@@ -31,28 +34,6 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
       }
     });
     super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-       child: Column(
-         children: <Widget>[
-           _montoField(),
-           SizedBox(height: 12),
-           _comboPlazo(context),
-           SizedBox(height: 12),
-           _comboCobro(context),
-           SizedBox(height: 12),
-           _comboUtilidad(context),
-           SizedBox(height: 12),
-           _crearInputDate(context),
-           SizedBox(height: 12),
-           _calcContainer(context),
-
-         ],
-       ),
-    );
   }
 
   void _calcular() {
@@ -262,6 +243,28 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
         onPointerDown: (_) { FocusScope.of(context).requestFocus(_node);},
         child: child
       )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+       child: Column(
+         children: <Widget>[
+           _montoField(),
+           SizedBox(height: 12),
+           _comboPlazo(context),
+           SizedBox(height: 12),
+           _comboCobro(context),
+           SizedBox(height: 12),
+           _comboUtilidad(context),
+           SizedBox(height: 12),
+           _crearInputDate(context),
+           SizedBox(height: 12),
+           _calcContainer(context),
+
+         ],
+       ),
     );
   }
 }

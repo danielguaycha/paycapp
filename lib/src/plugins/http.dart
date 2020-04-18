@@ -8,10 +8,12 @@ import 'package:paycapp/src/utils/navigator.service.dart';
 class HttpClient {
 
   Dio dio;
+  DioCacheManager _cacheManager;
   final NavigationService _navigationService = locator<NavigationService>();
 
 
   HttpClient() {
+    _cacheManager = DioCacheManager(CacheConfig(baseUrl: urlApi, databaseName: 'paycenter.db'));
     dio = new Dio(new BaseOptions(
         baseUrl: urlApi,
         connectTimeout: 5000,
@@ -40,6 +42,19 @@ class HttpClient {
           return e;//continue
         }
     ));
-    dio.interceptors.add(DioCacheManager(CacheConfig(baseUrl: urlApi)).interceptor);
+    dio.interceptors.add(_cacheManager.interceptor);
+  }
+
+  clearCachePrimary(path) {
+    _cacheManager.deleteByPrimaryKey(urlApi+path);
+  }
+
+  clearAllCache() {
+    if (_cacheManager != null)
+      _cacheManager.clearAll();
+  }
+
+  clearExpired() {
+    _cacheManager.clearExpired();
   }
 }

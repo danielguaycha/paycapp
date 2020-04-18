@@ -36,4 +36,6 @@ const Map<String, String> categorias = {
 
 const List<int> utilidad = [10, 20, 40];
 
+const initialGeo = [-3.258674355100698, -79.95593123137951];
+
 int defaultUtility = utilidad.elementAt(0);

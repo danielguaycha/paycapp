@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/providers/auth_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart'
     show errMessage, textOrLoader;
+import '../brain.dart';
 
 class LoginPage extends StatefulWidget {
+  LoginPage({Key key}) : super(key: key);
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -12,13 +16,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _authProvider = new AuthProvider();
   final _formKey = GlobalKey<FormState>();
-
-  String _user = '';
-  String _password = '';
-
-  String _msg = '';
   bool _loader = false;
-
   // logo
   final _logo = SizedBox(
     height: 110.0,
@@ -27,6 +25,10 @@ class _LoginPageState extends State<LoginPage> {
       fit: BoxFit.contain,
     ),
   );
+
+  String _msg = '';
+  String _password = '';
+  String _user = '';
 
   // username input
   _userInput() {
@@ -69,35 +71,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-          child: Container(
-            margin: EdgeInsets.only(top: 20),
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  SizedBox(height: 45.0),
-                  _logo,
-                  errMessage(msg: _msg),
-                  _userInput(),
-                  SizedBox(height: 20.0),
-                  _pwInput(),
-                  SizedBox(height: 30.0),
-                  _btnLogin(context)
-
-                ],
-              ),
-            ),
-          ),
-
-      ),
-    );
+  Widget _connector ({Widget child}) {
+    return StoreConnector<AppState, Function>(
+      onInit: (store) => () {
+        print(store);
+      },
+      converter: (store) => (){},
+      builder: (context, callback) {
+        return child;
+      });
   }
 
   Widget _btnLogin(BuildContext context) {
@@ -140,13 +122,46 @@ class _LoginPageState extends State<LoginPage> {
 
     // Success Login ----------------------
     if(res.data != null && res.data['access_token']!=null) {
+      final store = StoreProvider.of<AppState>(context);
+      store.dispatch(setUser);
       Navigator.pushReplacementNamed(context, 'home');
     }
-
-
 
     setState(() {
       _loader = false;
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _connector(
+      child: Scaffold(
+        body: SingleChildScrollView(
+            child: Container(
+              margin: EdgeInsets.only(top: 20),
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    SizedBox(height: 45.0),
+                    _logo,
+                    errMessage(msg: _msg),
+                    _userInput(),
+                    SizedBox(height: 20.0),
+                    _pwInput(),
+                    SizedBox(height: 30.0),
+                    _btnLogin(context)
+
+                  ],
+                ),
+              ),
+            ),
+
+        ),
+      ),
+    );
   }
 }

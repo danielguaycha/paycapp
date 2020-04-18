@@ -31,7 +31,6 @@ class _CreditClientComponentState extends State<CreditClientComponent> {
   void didUpdateWidget(CreditClientComponent oldWidget) {
     this._client = widget.client;
     this.rellenarDatos();
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
 
@@ -128,7 +127,6 @@ class _CreditClientComponentState extends State<CreditClientComponent> {
 
   void rellenarDatos () {
     if (_client == null) return; // si no se tiene nada en cliente no se llena
-
     String name = "${_client.name} ${_client.surname}".toUpperCase();
     _userField.value = TextEditingValue(text: name);
     _dir.value = TextEditingValue(text: (_client.address ?? 'Ninguna' ));
@@ -136,37 +134,5 @@ class _CreditClientComponentState extends State<CreditClientComponent> {
     _telB.value = TextEditingValue(text: (_client.phones_b ?? '000000000' ));
     _mail.value = TextEditingValue(text: (_client.email ?? '' ));
     setState(() {});
-  }
-
-  Widget _floatingsBtn(context) {
-    return Align(
-        alignment: Alignment.bottomRight,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            RawMaterialButton(
-              onPressed: () {},
-              child: new Icon(
-                FontAwesomeIcons.userPlus,
-                color: Theme.of(context).primaryColor,
-                size: 20.0,
-              ),
-              shape: new CircleBorder(),
-              elevation: 8.0,
-              fillColor: Colors.grey[300],
-              padding: const EdgeInsets.all(10.0),
-            ),
-            SizedBox(height: 20,),
-            FloatingActionButton(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white70,
-              child: Icon(Icons.search),
-              onPressed: () {
-                searchClient(context);
-              },
-            ),
-          ],
-        )
-    );
-  }
+  }  
 }

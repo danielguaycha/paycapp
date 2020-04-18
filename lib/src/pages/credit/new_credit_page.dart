@@ -19,16 +19,19 @@ class _NewCreditPageState extends State<NewCreditPage> {
 
   Person _client;
   Credit _credit;
+  bool _geoloc;
 
   _setClient(Person client) {
     setState(() {
       _client = client;
+      _credit.address = client.address;
     });
   }
 
   @override
   void initState() {
     this._credit = new Credit();
+    this._geoloc = true;    
     super.initState();
   }
 
@@ -68,7 +71,7 @@ class _NewCreditPageState extends State<NewCreditPage> {
       return _floatingForCredit();
     }
     else {
-      return Container();
+      return _floatingForExtra(context);
     }
 
   }
@@ -88,6 +91,7 @@ class _NewCreditPageState extends State<NewCreditPage> {
           backgroundColor: Theme.of(context).primaryColor,
           foregroundColor: Colors.white,
           child:  Icon(Icons.done),
+          tooltip: 'Siguiente',
         )
       ],
     );
@@ -116,9 +120,32 @@ class _NewCreditPageState extends State<NewCreditPage> {
             else
               next();
           },
+          tooltip: _client != null ? 'Siguiente': 'Buscar cliente',
           backgroundColor: Theme.of(context).primaryColor,
           foregroundColor: Colors.white,
           child: (_client != null) ? Icon(Icons.done) : Icon( Icons.search),
+        )
+      ],
+    );
+  }
+
+  // botones Flotantes para Extra
+  Widget _floatingForExtra(context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        _minBtn(
+            onPressed: () {goTo(1);}
+        ),
+        SizedBox(height: 10),
+        FloatingActionButton(
+          onPressed: () {
+              
+          },
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          tooltip: 'Guardar Crédito',
+          child:  Icon(FontAwesomeIcons.solidPaperPlane),
         )
       ],
     );
@@ -131,7 +158,7 @@ class _NewCreditPageState extends State<NewCreditPage> {
         icon,
         color: Theme.of(context).primaryColor,
         size: 17.0,
-      ),
+      ),  
       shape: new CircleBorder(),
       constraints: BoxConstraints(minHeight: 35, minWidth: 35),
       elevation: 7,
@@ -160,7 +187,7 @@ class _NewCreditPageState extends State<NewCreditPage> {
       Step(
           title: const Text('Referencia'),
           subtitle: Text('Prenda'),
-          content: CreditExtraComponent(credit: _credit),
+          content: CreditExtraComponent(credit: _credit, geoLoc: _geoloc),
           state: _getState(2),
           isActive: _currentStep == 2),
     ];
