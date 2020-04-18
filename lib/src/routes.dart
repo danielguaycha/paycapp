@@ -5,7 +5,7 @@ import 'package:paycapp/src/pages/expense/add_expense_page.dart';
 import 'package:paycapp/src/pages/home_page.dart';
 import 'package:paycapp/src/pages/login_page.dart';
 import 'package:paycapp/src/pages/client/add_client_page.dart';
-import 'package:paycapp/src/pages/map_page.dart';
+import 'package:paycapp/src/pages/maps/map_page.dart';
 
 Map<String, WidgetBuilder> getAppRoutes() {
 

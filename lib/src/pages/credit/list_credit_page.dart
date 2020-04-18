@@ -14,12 +14,12 @@ import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart'
     show loader, money, renderError, renderNotFoundData;
 import 'package:paycapp/src/config.dart' show colors;
-import '../map_only_location_page.dart';
-import '../map_with_route.dart';
+import '../maps/map_only_location_page.dart';
+import '../maps/map_with_route.dart';
 
 // List<LatLng> _listLocations = new List<LatLng>();
 // List<String> _listname = new List<String>();
-List<ClientCredit> _listClients = new List<ClientCredit>();
+List<DataClient> _listClients = new List<DataClient>();
 class ListCreditPage extends StatefulWidget {
   @override
   _ListCreditPageState createState() => _ListCreditPageState();
@@ -113,7 +113,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
   }
 
   Slidable _elements(context, credit, results, index) {
-    _listClients.add(new ClientCredit(credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], credit['ruta']));
+    _listClients.add(new DataClient(credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], zone: credit['ruta'] ));
 
     return Slidable(
         actionPane: SlidableDrawerActionPane(),
@@ -141,14 +141,16 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
         ),
         actions: <Widget>[
           IconSlideAction(
-            caption: 'Ubicacion',
+            caption: 'Ubicación',
             color: Colors.blue,
             icon: Icons.map,
             onTap: () async {
+              List<DataClient> _dataClient = new List<DataClient>();
+              _dataClient.add(new DataClient( credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], zone: credit['ruta'] ));
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MapOnlyLocationPage( cliente: new ClientCredit(credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], credit['ruta']))));
+                      builder: (context) => MapRoutePage(cliente: _dataClient)));
               },
           ),
         ],

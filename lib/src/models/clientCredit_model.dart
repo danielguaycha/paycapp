@@ -1,20 +1,23 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class ClientCredit {
+class DataClient {
+  //--Informacion basica
   String lat;
   String lng;
   String name;
   String address;
-  String zone;
 
+  //-- Informacion adicional
+  String zone;
+  // Para pagos
   bool payment;
-  double distancia;
   String cobro;
   int status;
-  BitmapDescriptor bitmapDescriptor;
+  // Para asignar una distancia en el mapa
+  double distancia;
 
-  ClientCredit(String lat, String lng, String name, String address, String zone,
-      {double distancia, bool payment, String cobro, int status, BitmapDescriptor bitmapDescriptor}) {
+  DataClient(String lat, String lng, String name, String address,
+      {String zone, double distancia, bool payment, String cobro, int status}) {
     this.lat = lat;
     this.lng = lng;
     this.name = name;
@@ -25,6 +28,5 @@ class ClientCredit {
     this.distancia = distancia;
     this.cobro = cobro;
     this.status = status;
-    this.bitmapDescriptor = bitmapDescriptor;
   }
 }

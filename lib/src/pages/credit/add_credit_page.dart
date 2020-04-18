@@ -23,7 +23,7 @@ import 'package:paycapp/src/utils/utils.dart'
 import 'package:paycapp/src/config.dart'
     show plazos, utilidad, cobros, defaultUtility;
 
-import '../map_only_page.dart';
+import '../maps/map_only_page.dart';
 import 'package:path/path.dart';
 
 class AddCreditPage extends StatefulWidget {

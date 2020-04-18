@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:paycapp/src/models/clientCredit_model.dart';
 import 'package:paycapp/src/models/responser.dart';
+import 'package:paycapp/src/pages/maps/map_with_route.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart';
-
-import '../../config.dart';
-import '../map_only_location_page.dart';
 import 'list_payments_page.dart';
 
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 String reason = "";
 ProgressLoader _loader;
 
+// Este metodo retorna un widget Slideable con toda la informacion necesaria para cobros
 Widget slideableForPyments({
   String idPago,
   String date,
@@ -133,17 +132,20 @@ Widget slideableForPyments({
                 ),
         ],
       ),
-      onLongPress: () {
-        _callModalBotonsheet(context,
-            textInfo: address,
-            urlImage: refImage,
-            refDetail: refDetail,
-            lat: lat,
-            lon: lon,
-            name: name,
-            surname: surname,
-            address: address);
-      },
+      onLongPress: showDetail
+          ? () {
+              _callModalBotonsheet(context,
+                  textInfo: address,
+                  urlImage: refImage,
+                  refDetail: refDetail,
+                  lat: lat,
+                  lon: lon,
+                  name: name,
+                  surname: surname,
+                  address: address,
+                  status: int.parse(state));
+            }
+          : null,
     )),
     actions: <Widget>[
       IconSlideAction(
@@ -182,6 +184,7 @@ Widget slideableForPyments({
   );
 }
 
+// Llamar al modalBotonSheet
 void _callModalBotonsheet(context,
     {String textInfo,
     String urlImage,
@@ -190,7 +193,7 @@ void _callModalBotonsheet(context,
     String lon,
     String name,
     String surname,
-    String address}) {
+    String address, int status}) {
   showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -210,7 +213,7 @@ void _callModalBotonsheet(context,
               title: Text("Ubicacion"),
               onTap: () {
                 Navigator.pop(context);
-                gotToMap(context, lat, lon, "$name $surname", address);
+                gotToMap(context, lat, lon, "$name $surname", address, status);
               },
             ),
             ListTile(
@@ -226,6 +229,7 @@ void _callModalBotonsheet(context,
       });
 }
 
+// En caso de encontrarse en la lista de pagos en un credito se llama a este widget para tener la opcion de anular
 Widget iconSlideActionAnular(idPago, context) {
   return IconSlideAction(
     caption: 'Anular',
@@ -237,12 +241,14 @@ Widget iconSlideActionAnular(idPago, context) {
   );
 }
 
+// Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar un elemento
 List<Widget> oneElement(idPago, context) {
   List<Widget> list = new List<Widget>();
   list.add(iconSlideActionAnular(idPago, context));
   return list;
 }
-
+// Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar dos elementos
+// Llamado al elemento de la lista anterior
 List<Widget> twoElements(idPago, context, creditID) {
   List<Widget> list = new List<Widget>();
   list.add(iconSlideActionAnular(idPago, context));
@@ -339,6 +345,7 @@ Future _displayDialog(BuildContext context) async {
       });
 }
 
+// Mostrar un Alert con la direccion del cliente
 Future _displayText(BuildContext context, {@required String text}) async {
   return showDialog(
     context: context,
@@ -364,6 +371,7 @@ Future _displayText(BuildContext context, {@required String text}) async {
   );
 }
 
+// Mostrar un alert con la imagen y descripcion de referencia
 Future _displayImage(BuildContext context,
     {@required String url, String refDetail}) async {
   return showDialog(
@@ -393,10 +401,12 @@ Future _displayImage(BuildContext context,
   );
 }
 
-void gotToMap(context, String lat, String lon, String name, String address) {
+// Ir al mapa en base a la ubicacion de un pago
+void gotToMap(context, String lat, String lon, String name, String address, int status) {
+  List<DataClient> _dataClient = new List<DataClient>();
+  _dataClient.add(new DataClient(lat, lon, name, address, status: status));
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => MapOnlyLocationPage(
-              cliente: new ClientCredit(lat, lon, name, address, ""))));
+          builder: (context) => MapRoutePage(cliente: _dataClient)));
 }

@@ -10,14 +10,14 @@ import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/providers/route_provider.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
-import '../map_with_route.dart';
+import '../maps/map_with_route.dart';
 
 //Variables
 String _fecha = "";
 String category = 'diario';
 Ruta route;
 final _scaffoldKey = GlobalKey<ScaffoldState>();
-List<ClientCredit> _paymentsClients = new List<ClientCredit>();
+List<DataClient> _paymentsClients = new List<DataClient>();
 class ShowPaymentsPage extends StatefulWidget {
   ShowPaymentsPage({Key key}) : super(key: key);
 
@@ -165,7 +165,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     _paymentsClients.clear();
     for (int i = 0; i < results.length; i++) {
       var payment = results[i];
-    _paymentsClients.add(new ClientCredit(payment['lat'].toString(), payment['lon'].toString(), "${payment['client_name']}  ${payment['client_surname']} ", payment['address'], null, payment: true, cobro: payment['cobro'], status: payment['status']));
+    _paymentsClients.add(new DataClient(payment['lat'].toString(), payment['lon'].toString(), "${payment['client_name']}  ${payment['client_surname']} ", payment['address'], payment: true, cobro: payment['cobro'], status: payment['status']));
     }
   }
 
