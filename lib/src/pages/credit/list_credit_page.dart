@@ -249,6 +249,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
               child: 
             TextField(
               
+              autofocus: true,
                 onSubmitted: (v) {},
                 onChanged: (value) {
                   _search = value;
