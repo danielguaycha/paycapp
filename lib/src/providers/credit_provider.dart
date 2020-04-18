@@ -53,22 +53,23 @@ class CreditProvider {
   }
 
   Future<dynamic> list({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null", String search = "null"}) async {
-    if(search == "null"){
+    // if(search == "null"){
 
     String url = "/credit?page=$page";
     
     url = (ruta !="null") ? url + "&ruta=$ruta" : url;
     url = (plazo !="null") ? url + "&plazo=$plazo" : url;
     url = (cobros !="null") ? url + "&cobro=$cobros" : url;
+    url = (search !="null") ? url + "&q=$search" : url;
 
     Response res = await _http.get(url);
     return Responser.fromJson(res.data);
-    }else{
+    // }else{
     
-      String url = "/credit/search?q=$search";
-      Response res = await _http.get(url);
-      return Responser.fromJson(res.data);
-    }
+    //   String url = "/credit/search?q=$search";
+    //   Response res = await _http.get(url);
+    //   return Responser.fromJson(res.data);
+    // }
 
   }
 

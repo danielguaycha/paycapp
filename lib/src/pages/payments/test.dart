@@ -26,55 +26,7 @@ class _TestPageState extends State<TestPage> {
                 child: Column(
                   children: <Widget>[
 
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
                     
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
-                    
-                    ListTile(
-                      leading: Icon(Icons.image),
-                      title: Text("data"),
-                    ),
                     
                     ListTile(
                       leading: Icon(Icons.image),

@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:paycapp/src/brain.dart';
 import 'package:paycapp/src/models/auth_model.dart';
 import 'package:paycapp/src/models/credit_model.dart';
-import 'package:paycapp/src/pages/map_only_page.dart';
+import 'package:paycapp/src/pages/maps/map_only_page.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
 class CreditExtraComponent extends StatefulWidget {

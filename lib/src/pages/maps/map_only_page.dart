@@ -3,7 +3,7 @@ import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:paycapp/src/utils/messages_util.dart';
+import 'package:paycapp/src/utils/utils.dart' show loader;
 
 double _latSelected = 0.0;
 double _longSelected = 0.0;
@@ -19,7 +19,7 @@ class MapOnlyPage extends StatefulWidget {
 class _MapOnlyPageState extends State<MapOnlyPage> {
   final Set<Marker> _markers = Set();
 
-  CameraPosition _initialPosition = null;
+  CameraPosition _initialPosition;
   Completer<GoogleMapController> _controller = Completer();
 
   void _onMapCreated(GoogleMapController controller) {
@@ -32,7 +32,6 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text("Seleccionar Ubicacion"),
-          centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.send),
@@ -45,17 +44,7 @@ class _MapOnlyPageState extends State<MapOnlyPage> {
             future: _getLoc(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      CircularProgressIndicator(),
-                      SizedBox(height: 10),
-                      Text('Cargando mapa...')
-                    ],
-                  ),
-                );
+                return loader(text: "Cargando mapa...");
               } else {
                 if (!_locationChange) {
                   print("Pinta la marca inicial");

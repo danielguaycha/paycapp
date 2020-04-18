@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:paycapp/src/pages/credit/list_credit_page.dart';
 import 'package:paycapp/src/pages/expense/list_expense_page.dart';
 import 'package:paycapp/src/pages/index_page.dart';
+// import 'package:paycapp/src/pages/payments/show_credit_and_payments_page.dart';
 import 'package:paycapp/src/pages/payments/show_payments_page.dart';
 import 'package:paycapp/src/pages/user/user_page.dart';
 import 'package:paycapp/src/utils/local_storage.dart';

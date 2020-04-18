@@ -267,12 +267,10 @@ bool isNumeric(String s) {
 }
 
 Widget showImage(String urlImagen){
-    // print("IMURL: $urlImagen");
-    // print("Ruta: ${getImagen(urlImagen)}");
     return FadeInImage.assetNetwork(
       fadeInCurve: Curves.decelerate,
       image: getImagen(urlImagen),
-      placeholder: 'assets/img/pin/diario/pendiente.png', //load.gif',
+      placeholder: 'assets/img/load.gif',
     );
   }
 
