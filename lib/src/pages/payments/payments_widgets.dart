@@ -28,6 +28,7 @@ Widget slideableForPyments({
   String refImage,
   String lat,
   String lon,
+  String cobro,
   @required Function retry,
   @required context,
   @required scaffoldKey,
@@ -143,49 +144,145 @@ Widget slideableForPyments({
                   name: name,
                   surname: surname,
                   address: address,
-                  status: int.parse(state));
+                  status: int.parse(state),
+                  idCredit: creditID,
+                  cobro: cobro 
+              );
             }
           : null,
     )),
     actions: <Widget>[
-      IconSlideAction(
-        caption: 'Pagar',
-        color: Colors.green,
-        icon: Icons.payment,
-        onTap: () async {
-          // 2 sginfica que esta pagado
-          bool process = await _updatePayment(int.parse(idPago), 2, context,
-              title: "Realizar pago",
-              content: "¿Está seguro de realizar este pago?");
-          if (process) {
-            print("Se pago");
-            retry();
-          }
-        },
-      ),
-      IconSlideAction(
-        caption: 'Mora',
-        color: Colors.red,
-        icon: Icons.remove_circle_outline,
-        onTap: () async {
-          // -1 sginfica que estara en mora
-          bool process = await _updatePayment(int.parse(idPago), -1, context,
-              title: "Marcar en Mora",
-              content: "¿Está seguro que desea marcar como mora este pago?");
-          if (process) {
-            retry();
-          }
-        },
-      ),
+      _slidePagar(state, idPago, context, retry),
+      _slideMora(state, idPago, context, retry),
     ],
     secondaryActions: showDetail
-        ? twoElements(idPago, context, creditID)
-        : oneElement(idPago, context),
+        ? twoElements(idPago, context, creditID, state)
+        : oneElement(idPago, context, state),
   );
 }
 
+Widget _slideMora(String state, String idPago, context, Function retry) {
+  return IconSlideAction(
+    caption: 'Mora',
+    color: Colors.red,
+    icon: Icons.remove_circle_outline,
+    onTap: () async {
+      if (int.parse(state) == TYPE_MORA) {
+        return null;
+      }
+
+      if (int.parse(state) == TYPE_PAGADO) {
+        _scaffoldKey.currentState
+            .showSnackBar(customSnack("Esta pago ya fue procesado", type: 'err'));
+        return null;
+      }
+
+      String process = await updatePayment(
+          int.parse(idPago), TYPE_MORA, context,
+          title: "Marcar en Mora",
+          content: "¿Está seguro que desea marcar como mora este pago?");
+      if (process != null) {
+        if (process == "OK") {
+          _scaffoldKey.currentState
+              .showSnackBar(customSnack("Marcado como mora"));
+          retry();
+        } else {
+          _scaffoldKey.currentState
+              .showSnackBar(customSnack(process, type: 'err'));
+        }
+      }
+    },
+  );
+}
+
+Widget _slidePagar(String state, String idPago, context, Function retry) {
+  return IconSlideAction(
+    caption: 'Pagar',
+    color: Colors.green,
+    icon: Icons.payment,
+    onTap: () async {
+      if (int.parse(state) == TYPE_PAGADO) {
+        return null;
+      }
+
+      String process = await updatePayment(
+          int.parse(idPago), TYPE_PAGADO, context,
+          title: "Realizar pago",
+          content: "¿Está seguro de realizar este pago?");
+      if (process != null) {
+        if (process == "OK") {
+          _scaffoldKey.currentState
+              .showSnackBar(customSnack("Pago confirmado"));
+          retry();
+        } else {
+          _scaffoldKey.currentState
+              .showSnackBar(customSnack(process, type: 'err'));
+        }
+      }
+    },
+  );
+}
+
+// En caso de encontrarse en la lista de pagos en un credito se llama a este widget para tener la opcion de anular
+Widget _slideAnular(idPago, context, state) {
+  return IconSlideAction(
+    caption: 'Anular',
+    color: Theme.of(context).primaryColor,
+    icon: Icons.delete,
+    onTap: () async {
+      if (int.parse(state) == TYPE_MORA || int.parse(state) == TYPE_PENDIENTE) {
+        _scaffoldKey.currentState.showSnackBar(
+            customSnack("Solo se pueden anular pagos procesados", type: 'err'));
+        return null;
+      }
+
+      String process =
+          await cancelPaymentOnPayments(int.parse(idPago), context);
+      if (process != null) {
+        if (process == "OK") {
+          _scaffoldKey.currentState
+              .showSnackBar(customSnack("Pago anulado con exito"));
+        } else {
+          _scaffoldKey.currentState
+              .showSnackBar(customSnack(process, type: 'err'));
+        }
+      }
+    },
+  );
+}
+
+Widget _slideVerDetalle(String creditID, context) {
+  return IconSlideAction(
+    caption: 'Ver detalle',
+    color: Colors.amber,
+    icon: Icons.list,
+    onTap: () async {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ListPaymentsPage(id: int.parse(creditID))));
+    },
+  );
+}
+
+// Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar un elemento
+List<Widget> oneElement(idPago, context, state) {
+  List<Widget> list = new List<Widget>();
+  list.add(_slideAnular(idPago, context, state));
+  return list;
+}
+
+// Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar dos elementos
+// Llamado al elemento de la lista anterior
+List<Widget> twoElements(idPago, context, creditID, state) {
+  List<Widget> list = new List<Widget>();
+  list.add(_slideAnular(idPago, context, state));
+  list.add(_slideVerDetalle(creditID, context));
+  return list;
+}
+
 // Llamar al modalBotonSheet
-void _callModalBotonsheet(context,
+_callModalBotonsheet(context,
     {String textInfo,
     String urlImage,
     String refDetail,
@@ -193,7 +290,10 @@ void _callModalBotonsheet(context,
     String lon,
     String name,
     String surname,
-    String address, int status}) {
+    String address,
+    int status,
+    String cobro,
+    String idCredit}) {
   showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -213,7 +313,7 @@ void _callModalBotonsheet(context,
               title: Text("Ubicacion"),
               onTap: () {
                 Navigator.pop(context);
-                gotToMap(context, lat, lon, "$name $surname", address, status);
+                gotToMap(context, lat, lon, "$name $surname", address, status, cobro, idCredit);
               },
             ),
             ListTile(
@@ -229,97 +329,60 @@ void _callModalBotonsheet(context,
       });
 }
 
-// En caso de encontrarse en la lista de pagos en un credito se llama a este widget para tener la opcion de anular
-Widget iconSlideActionAnular(idPago, context) {
-  return IconSlideAction(
-    caption: 'Anular',
-    color: Theme.of(context).primaryColor,
-    icon: Icons.delete,
-    onTap: () async {
-      bool process = await _deleteCredit(int.parse(idPago), context);
-    },
-  );
-}
 
-// Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar un elemento
-List<Widget> oneElement(idPago, context) {
-  List<Widget> list = new List<Widget>();
-  list.add(iconSlideActionAnular(idPago, context));
-  return list;
-}
-// Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar dos elementos
-// Llamado al elemento de la lista anterior
-List<Widget> twoElements(idPago, context, creditID) {
-  List<Widget> list = new List<Widget>();
-  list.add(iconSlideActionAnular(idPago, context));
-  list.add(
-    new IconSlideAction(
-      caption: 'Ver detalle',
-      color: Colors.amber,
-      icon: Icons.list,
-      onTap: () async {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    ListPaymentsPage(id: int.parse(creditID))));
-      },
-    ),
-  );
-  return list;
-}
 
 //Actualizar a mora
-Future<bool> _updatePayment(int id, int status, context,
+Future<String> updatePayment(int id, int status, context,
     {String title, String content}) async {
+  _loader = new ProgressLoader(context);
+  String _respuesta = "";
+
   int isOk = await Alert.confirm(context, title: title, content: content);
   if (isOk == 1) {
-    return false;
+    return null;
   }
   _loader.show(msg: "Actualizando...");
   Responser res = await CreditProvider().updatePayment(id, status);
   if (res.ok) {
-    _scaffoldKey.currentState
-        .showSnackBar(customSnack("Actualizado con exito"));
+    // _scaffoldKey.currentState
+    //     .showSnackBar(customSnack("Actualizado con exito"));
+    _respuesta = "OK";
   } else {
-    print("ERROR: ${res.message}");
-    _scaffoldKey.currentState
-        .showSnackBar(customSnack(res.message, type: 'err'));
+    // print("ERROR: ${res.message}");
+    // _scaffoldKey.currentState
+    //     .showSnackBar(customSnack(res.message, type: 'err'));
+    _respuesta = res.message;
   }
   _loader.hide();
-  return true;
+  return _respuesta;
 }
 
-// Anular crédito
-Future<bool> _deleteCredit(creditId, context) async {
+// Anular pago
+Future<String> cancelPaymentOnPayments(creditId, context) async {
+  String _response;
   int isOk = await Alert.confirm(context,
       title: "Anular Pago",
       content: "¿Está seguro que desea anular este pago?");
   if (isOk == 1) {
-    return false;
+    return null;
   }
   if (creditId <= 0) {
-    _scaffoldKey.currentState.showSnackBar(
-        customSnack("No se ha podido anular este pago", type: 'err'));
-    return false;
+    return "No se ha podido anular este pago";
   }
 
   await _displayDialog(context);
   _loader.show(msg: "Anulando crédito");
   Responser res = await CreditProvider().deletePayments(creditId, reason);
   if (res.ok) {
-    _scaffoldKey.currentState
-        .showSnackBar(customSnack("Pago anulado con exito"));
+    _response = "OK";
   } else {
-    _scaffoldKey.currentState
-        .showSnackBar(customSnack(res.message, type: 'err'));
+    _response = res.message;
   }
   _loader.hide();
-  return true;
+  return _response;
 }
 
 Future _displayDialog(BuildContext context) async {
-  //_textEditingController.text = "";
   reason = "";
   return showDialog(
       context: context,
@@ -327,7 +390,6 @@ Future _displayDialog(BuildContext context) async {
         return AlertDialog(
           title: Text('Ingrese el motivo por el cual va a anular el pago'),
           content: TextField(
-            //controller: _textEditingController,
             decoration: InputDecoration(hintText: "Motivo"),
             onChanged: (text) {
               reason = text;
@@ -402,9 +464,10 @@ Future _displayImage(BuildContext context,
 }
 
 // Ir al mapa en base a la ubicacion de un pago
-void gotToMap(context, String lat, String lon, String name, String address, int status) {
+void gotToMap(
+    context, String lat, String lon, String name, String address, int status, String cobro, String idCredit) {
   List<DataClient> _dataClient = new List<DataClient>();
-  _dataClient.add(new DataClient(lat, lon, name, address, status: status));
+  _dataClient.add(new DataClient(lat, lon, name, address, status: status, cobro: cobro, idCredit: int.parse(idCredit)));
   Navigator.push(
       context,
       MaterialPageRoute(

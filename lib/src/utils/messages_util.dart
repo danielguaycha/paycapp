@@ -60,11 +60,11 @@ Widget customSnack(String message, {String type: 'ok'}) {
   switch(type.toLowerCase()){
     case 'ok':
       snack = SnackBar(content: Text(message),
-        backgroundColor: Colors.green, elevation: 12, duration: Duration(seconds: 4));
+        backgroundColor: Colors.green, elevation: 12, duration: Duration(seconds: 3));
       break;
     case 'err':
       snack = SnackBar(content: Text(message),
-        backgroundColor: Colors.red, elevation: 12, duration: Duration(seconds: 5));
+        backgroundColor: Colors.red, elevation: 12, duration: Duration(seconds: 3));
       break;
     default:
       snack = SnackBar(content: Text(message));
