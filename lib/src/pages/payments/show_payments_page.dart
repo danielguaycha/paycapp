@@ -165,7 +165,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     _paymentsClients.clear();
     for (int i = 0; i < results.length; i++) {
       var payment = results[i];
-    _paymentsClients.add(new DataClient(payment['lat'].toString(), payment['lon'].toString(), "${payment['client_name']}  ${payment['client_surname']} ", payment['address'], payment: true, cobro: payment['cobro'], status: payment['status']));
+    _paymentsClients.add(new DataClient(payment['lat'].toString(), payment['lon'].toString(), "${payment['client_name']}  ${payment['client_surname']} ", payment['address'], payment: true, cobro: payment['cobro'], status: payment['status'], idPayment: payment['id'], idCredit: payment['credit_id'] ));
     }
   }
 
@@ -197,6 +197,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
                   refImage: payment['ref_img'].toString(),
                   lat: payment['lat'].toString(),
                   lon: payment['lon'].toString(),
+                  cobro: payment['cobro'],
                   retry: _retry,
                   context: context,
                   scaffoldKey: scaffoldKey,

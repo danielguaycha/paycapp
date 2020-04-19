@@ -9,6 +9,7 @@ import 'package:paycapp/src/config.dart' show urlApi;
 import 'package:paycapp/src/config.dart' show debug;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+
 // Loader Component
 Widget loader({String text = 'Cargando...'}) {
   return Center(
@@ -30,7 +31,11 @@ Widget miniLoader() {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        SizedBox(child: CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.black12)), height: 25, width: 25)
+        SizedBox(
+            child: CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(Colors.black12)),
+            height: 25,
+            width: 25)
       ],
     ),
   );
@@ -256,6 +261,17 @@ const List<String> choicesForPyments = <String>[
   "mensual",
 ];
 
+const List<String> actionForMap = <String>[
+  "cobrar",
+  "marcar en mora",
+  "anular",
+  "ver detalle",
+];
+
+const int TYPE_MORA = -1;
+const int TYPE_PENDIENTE = 1;
+const int TYPE_PAGADO = 2;
+
 String dateTimetoString(DateTime currentTime) {
   return "${currentTime.year}-${currentTime.month}-${currentTime.day}";
 }
@@ -274,38 +290,36 @@ bool isNumeric(String s) {
   return double.tryParse(s) != null;
 }
 
-Widget showImage(String urlImagen){
-    return FadeInImage.assetNetwork(
-      fadeInCurve: Curves.decelerate,
-      image: getImagen(urlImagen),
-      placeholder: 'assets/img/load.gif',
-    );
-  }
+Widget showImage(String urlImagen) {
+  return FadeInImage.assetNetwork(
+    fadeInCurve: Curves.decelerate,
+    image: getImagen(urlImagen),
+    placeholder: 'assets/img/load.gif',
+  );
+}
 
 //* Comprimidor de imagenes
 Future<File> compressImg(File file) async {
+  if (file == null) return null;
 
-    if(file == null) return null;
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  String appDocPath = appDocDir.path;
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-
-    String name = basename(file.path);
-    String fileName = 'compress-'+name.split('.')[0];
-    String ext = name.split('.').last;
+  String name = basename(file.path);
+  String fileName = 'compress-' + name.split('.')[0];
+  String ext = name.split('.').last;
     
-    String finalPath = appDocPath+'/'+fileName+'.'+ext;
+  String finalPath = appDocPath+'/'+fileName+'.'+ext;
     
-    var result = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path, finalPath,
-        quality: 88
-    );    
-    
-    return result;
-  }
+  var result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path, finalPath,
+      quality: 88
+  );      
+  return result;
+}
 
-  //* Round number
-  double round(double val, int places){ 
+//* Redondear numero
+double round(double val, int places){ 
    double mod = pow(10.0, places); 
-   return ((val * mod).round().toDouble() / mod); 
-  }
+  return ((val * mod).round().toDouble() / mod); 
+}

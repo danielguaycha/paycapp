@@ -1,8 +1,12 @@
+import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:paycapp/src/models/clientCredit_model.dart';
+import 'package:paycapp/src/pages/payments/list_payments_page.dart';
+import 'package:paycapp/src/pages/payments/payments_widgets.dart';
 import 'package:paycapp/src/providers/route_google_provider.dart';
+import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
 class MapRoutePage extends StatefulWidget {
@@ -13,6 +17,9 @@ class MapRoutePage extends StatefulWidget {
   @override
   _MapRoutePageState createState() => _MapRoutePageState();
 }
+
+ProgressLoader _newLoader;
+GlobalKey<ScaffoldState> _newScaffoldKey;
 
 // Constantes para los colores de los estados
 final double _yellow = 45.0;
@@ -53,7 +60,9 @@ class _MapRoutePageState extends State<MapRoutePage> {
 
   @override
   Widget build(BuildContext context) {
+    _newLoader = new ProgressLoader(context);
     return Scaffold(
+      key: _newScaffoldKey,
       appBar: AppBar(
           title: Text('Visualizar rutas'),
           centerTitle: true,
@@ -132,6 +141,20 @@ class _MapRoutePageState extends State<MapRoutePage> {
         // infoWindow: InfoWindow(title: "${item.name}", snippet: "${item.address}"),
       ));
     }
+
+    // Codigo para la paleta de colores
+    // double x = 0.0;
+    // for (double i = 0.0; i < 360; i = i + 0.1) {
+
+    //   x = x + 0.000008;
+    //   _markers.add(new Marker(
+    //     icon: BitmapDescriptor.defaultMarkerWithHue(i),
+    //     position: new LatLng(-3.2889400 + x,-79.899520 + x),
+    //     markerId: MarkerId("$i"),
+    //     infoWindow: InfoWindow(title: "$i")
+    //     ));
+    // }
+
     widget.cliente.clear();
 
     return Stack(
@@ -144,7 +167,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
           initialCameraPosition: _initialCameraPosition,
           rotateGesturesEnabled: true,
           markers: Set<Marker>.of(_markers),
-          polylines: _polyLines,
+          // polylines: _polyLines,
         ),
         _tarjetaFlotante(),
       ],
@@ -202,19 +225,15 @@ class _MapRoutePageState extends State<MapRoutePage> {
                           color: Colors.grey.withOpacity(0.5))
                     ]),
                 child: Row(
-                  mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(left: 10),
-                        width: 50,
-                        height: 50,
-                        child: Icon(Icons.person_pin),
-                      ),
+                      _showTypePayment(_dataClient.cobro, _dataClient.status),
                       Expanded(
                         child: Container(
-                          margin: EdgeInsets.only(left: 15, top: 5.0, bottom: 5.0),
+                          margin:
+                              EdgeInsets.only(left: 15, top: 5.0, bottom: 5.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,38 +252,203 @@ class _MapRoutePageState extends State<MapRoutePage> {
                           ),
                         ),
                       ),
+                      // Expanded(child:
+                      Container(
+                        margin: EdgeInsets.only(left: 10),
+                        width: 50,
+                        height: 50,
+                        child: PopupMenuButton<String>(
+                          onSelected: choiceAction,
+                          itemBuilder: (BuildContext context) {
+                            return actionForMap.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(
+                                  choice.toUpperCase(),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            }).toList();
+                          },
+                          // )
+                        ),
+                      ),
                     ]))));
   }
 
+  void choiceAction(String choice) async {
+    switch (choice) {
+      case "cobrar":
+        if (_dataClient.status == TYPE_PAGADO) {
+          return null;
+        }
+
+        String process = await updatePayment(
+            _dataClient.idPayment, TYPE_PAGADO, context,
+            title: "Realizar pago",
+            content: "¿Está seguro de realizar este pago?");
+        if (process != null) {
+          if (process == "OK") {
+            Alert.toast(context, "Pago realizado");
+            _dataClient.status = TYPE_PAGADO;
+            widget.cliente.add(_dataClient);
+            _retry();
+          } else {
+            Alert.toast(context, process);
+          }
+        }
+        break;
+      case "marcar en mora":
+        if (_dataClient.status == TYPE_MORA) {
+          return null;
+        }
+
+        if (_dataClient.status == TYPE_PAGADO) {
+          Alert.toast(context, "Esta pago ya fue procesado");
+          return null;
+        }
+
+        String process = await updatePayment(
+            _dataClient.idPayment, TYPE_MORA, context,
+            title: "Marcar en Mora",
+            content: "¿Está seguro que desea marcar como mora este pago?");
+        if (process != null) {
+          if (process == "OK") {
+            Alert.toast(context, "Marcado como mora");
+            _dataClient.status = TYPE_MORA;
+            widget.cliente.add(_dataClient);
+            _retry();
+          } else {
+            Alert.toast(context, process);
+          }
+        }
+        break;
+      case "anular":
+
+      if (_dataClient.status == TYPE_MORA || _dataClient.status == TYPE_PENDIENTE) {
+        Alert.toast(context, "Solo se pueden anular pagos procesados");
+        return null;
+      }
+
+      String process =
+          await cancelPaymentOnPayments(_dataClient.idPayment, context);
+      if (process != null) {
+        if (process == "OK") {
+        Alert.toast(context, "Pago anulado con exito");
+        _dataClient.status = TYPE_PENDIENTE;
+        widget.cliente.add(_dataClient);
+        _retry();
+        } else {
+        Alert.toast(context, process);
+        }
+      }
+        break;
+      case "ver detalle":
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ListPaymentsPage(id: _dataClient.idCredit)));
+        print("Ver detalle seleccionado");
+        break;
+    }
+  }
+
+  Color _setColor(int status) {
+    switch (status) {
+      case TYPE_PENDIENTE:
+        return Colors.grey;
+        break;
+      case TYPE_PAGADO:
+        return Colors.green;
+        break;
+      case TYPE_MORA:
+        return Colors.red;
+        break;
+      default:
+        return Colors.grey;
+        break;
+    }
+  }
+
+  // Muestra un icono diferente para pagos
+  Widget _showTypePayment(String cobro, int status) {
+    if (cobro == null) {
+      return Container(
+        margin: EdgeInsets.only(left: 10),
+        width: 40,
+        height: 40,
+        child: Icon(Icons.person_pin),
+      );
+    }
+    String _text = "D";
+    Color _color = _setColor(status);
+
+    switch (cobro) {
+      case "DIARIO":
+        _text = "D";
+        break;
+      case "SEMANAL":
+        _text = "S";
+        break;
+      case "QUINCENAL":
+        _text = "Q";
+        break;
+      case "MENSUAL":
+        _text = "M";
+        break;
+      default:
+        _text = "D";
+        break;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(left: 10),
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: _color),
+      ),
+      child: Center(
+        child: Text(
+          _text,
+          style: TextStyle(
+              color: _color, fontSize: 25.0, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
   // Muestra la zona del cliente
-  Widget _showZone(String zone){
-    return Visibility(visible: zone != null, child: Text("Zona: $zone"),);
+  Widget _showZone(String zone) {
+    return Visibility(
+      visible: zone != null,
+      child: Text("Zona: $zone"),
+    );
   }
 
   // Muestra texto en base al estado de pago
   Widget _showStatus(int status) {
+    String _text = "ESTADO: PENDIENTE";
+    bool _visible = (status != null);
     switch (status) {
-      case 1:
-        return Visibility(
-          visible: status != null,
-          child: Text("ESTADO: PENDIENTE", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),));
+      case TYPE_PENDIENTE:
+        _text = "ESTADO: PENDIENTE";
         break;
-      case 2:
-        return Visibility(
-          visible: status != null,
-          child: Text("ESTADO: COBRADO",style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),));
+      case TYPE_PAGADO:
+        _text = "ESTADO: COBRADO";
         break;
-      case -1:
-        return Visibility(
-          visible: status != null,
-          child: Text("ESTADO: MORA",style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),));
-        break;
-      default:
-        return Visibility(
-          visible: status != null,
-          child: Text("ESTADO: PENDIENTE", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),));
+      case TYPE_MORA:
+        _text = "ESTADO: MORA";
         break;
     }
+    return Visibility(
+        visible: _visible,
+        child: Text(
+          _text,
+          style:
+              TextStyle(color: _setColor(status), fontWeight: FontWeight.bold),
+        ));
   }
 
   // BitmapDescriptor _bitmapDescriptor;
@@ -296,7 +480,6 @@ class _MapRoutePageState extends State<MapRoutePage> {
   //   }
   //   return st;
   // }
-
 
   // obtener la ultima posicion de la lista
   getCoordinates(List<DataClient> values) {
