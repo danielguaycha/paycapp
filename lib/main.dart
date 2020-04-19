@@ -102,13 +102,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   _initUser() async{
+    print('setting user');
     if(_prefs.token == null) return;
 
     try{
       Auth auth = await AuthProvider().getCompleteAuth();
       widget.store.dispatch(new AddUserAction(auth));
-    } catch(e) {
-      print(e);
     }
+     catch(e) {
+      print(e);
+     }
   }
 }

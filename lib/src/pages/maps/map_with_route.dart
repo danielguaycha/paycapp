@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,6 +22,7 @@ class MapRoutePage extends StatefulWidget {
 
 ProgressLoader _newLoader;
 GlobalKey<ScaffoldState> _newScaffoldKey;
+GoogleMapController _mapController;
 
 // Constantes para los colores de los estados
 final double _yellow = 45.0;
@@ -34,9 +37,10 @@ String _name = "";
 String _address = "";
 DataClient _dataClient = new DataClient("0.0", "0.0", "", "");
 
+// Para almacenar la posicion actual
+LatLng _currentCoridinates;
+
 class _MapRoutePageState extends State<MapRoutePage> {
-  // Para almacenar la posicion actual
-  LatLng _currentCoridinates;
   // Para indicar en donde se enfocara la pantalla al inicar el mapa
   CameraPosition _initialCameraPosition;
   double _zoomForMap = 15.0;
@@ -46,6 +50,12 @@ class _MapRoutePageState extends State<MapRoutePage> {
   double _position = -100;
   // Para llamar al servicio de consulta de ruta
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
+  
+  Completer<GoogleMapController> _controller = Completer();
+
+  void _onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+  }
 
   @override
   void initState() {
@@ -117,12 +127,14 @@ class _MapRoutePageState extends State<MapRoutePage> {
             LatLng(_currentCoridinates.latitude, _currentCoridinates.longitude),
         zoom: _zoomForMap);
 
-    _markers.add(new Marker(
+        // _controller.
+
+    _markers.add(Marker(
       onTap: () => _hideCard(),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       position: _currentCoridinates,
-      markerId: MarkerId('$_currentCoridinates'),
-      infoWindow: InfoWindow(title: "Tu ubicación"),
+      markerId: MarkerId('myOnlyId'),
+      // infoWindow: InfoWindow(title: "Tu ubicación"),
     ));
 
     for (var item in listaClientes) {
@@ -163,6 +175,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
           onTap: (v) {
             _hideCard();
           },
+          onMapCreated: _onMapCreated,
           compassEnabled: false,
           initialCameraPosition: _initialCameraPosition,
           rotateGesturesEnabled: true,
@@ -181,6 +194,8 @@ class _MapRoutePageState extends State<MapRoutePage> {
   }
 
   void _retry() {
+    print("Imprimiendo");
+    _markers.removeWhere((m) => m.markerId.value == 'myOnlyId');
     setState(() {});
   }
 
@@ -253,26 +268,28 @@ class _MapRoutePageState extends State<MapRoutePage> {
                         ),
                       ),
                       // Expanded(child:
-                      Container(
-                        margin: EdgeInsets.only(left: 10),
-                        width: 50,
-                        height: 50,
-                        child: PopupMenuButton<String>(
-                          onSelected: choiceAction,
-                          itemBuilder: (BuildContext context) {
-                            return actionForMap.map((String choice) {
-                              return PopupMenuItem<String>(
-                                value: choice,
-                                child: Text(
-                                  choice.toUpperCase(),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              );
-                            }).toList();
-                          },
-                          // )
-                        ),
-                      ),
+                      Visibility(
+                          visible: _dataClient.status != null,
+                          child: Container(
+                            margin: EdgeInsets.only(left: 10),
+                            width: 50,
+                            height: 50,
+                            child: PopupMenuButton<String>(
+                              onSelected: choiceAction,
+                              itemBuilder: (BuildContext context) {
+                                return actionForMap.map((String choice) {
+                                  return PopupMenuItem<String>(
+                                    value: choice,
+                                    child: Text(
+                                      choice.toUpperCase(),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                            ),
+                          )),
                     ]))));
   }
 
@@ -324,30 +341,31 @@ class _MapRoutePageState extends State<MapRoutePage> {
         }
         break;
       case "anular":
-
-      if (_dataClient.status == TYPE_MORA || _dataClient.status == TYPE_PENDIENTE) {
-        Alert.toast(context, "Solo se pueden anular pagos procesados");
-        return null;
-      }
-
-      String process =
-          await cancelPaymentOnPayments(_dataClient.idPayment, context);
-      if (process != null) {
-        if (process == "OK") {
-        Alert.toast(context, "Pago anulado con exito");
-        _dataClient.status = TYPE_PENDIENTE;
-        widget.cliente.add(_dataClient);
-        _retry();
-        } else {
-        Alert.toast(context, process);
+        if (_dataClient.status == TYPE_MORA ||
+            _dataClient.status == TYPE_PENDIENTE) {
+          Alert.toast(context, "Solo se pueden anular pagos procesados");
+          return null;
         }
-      }
+
+        String process =
+            await cancelPaymentOnPayments(_dataClient.idPayment, context);
+        if (process != null) {
+          if (process == "OK") {
+            Alert.toast(context, "Pago anulado con exito");
+            _dataClient.status = TYPE_PENDIENTE;
+            widget.cliente.add(_dataClient);
+            _retry();
+          } else {
+            Alert.toast(context, process);
+          }
+        }
         break;
       case "ver detalle":
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ListPaymentsPage(id: _dataClient.idCredit)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ListPaymentsPage(id: _dataClient.idCredit)));
         print("Ver detalle seleccionado");
         break;
     }

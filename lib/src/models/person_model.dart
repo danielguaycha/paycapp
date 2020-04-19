@@ -44,7 +44,7 @@ class Person {
     email: json["email"],
     status: json["status"],
     mora: json["mora"],
-    rank: json["rank"],
+    rank: int.parse(json["rank"] == null ? '0' : json["rank"]),
   );
 
   String toRawJson() => json.encode(toJson());
