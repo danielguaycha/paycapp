@@ -28,6 +28,7 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
   TextEditingController _txtAdress = TextEditingController();
   TextEditingController _txtPrenda = TextEditingController();
   TextEditingController _txtRef = TextEditingController();
+
   bool _geoloc = true;
 
   // Mostrar loaders al cargar imagenes
@@ -57,8 +58,8 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
         _fieldReference(),
         Divider(height: 5),
         _fieldPrenda(),
-        _customGeoLoc(context)
-      ],
+        _customGeoLoc(context),
+      ]
     );
   }
 
@@ -213,9 +214,9 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
   }
 
 
-//*=== Dirección ===
+  //*=== Dirección ===
 
-_addressField() {
+  _addressField() {
     return TextFormField(
       controller: _txtAdress,
       textInputAction: TextInputAction.newline,
@@ -238,31 +239,38 @@ _addressField() {
   }
 
 
-//*=== Zonas ===
+  //*=== Zonas ===
 
-Widget _zones () {
-  return StoreConnector<AppState, dynamic>(
-      onInit: (store) => {},  
-      converter: (store) => store.state.user,
-      builder: (context, user) {                
-        return DropdownButtonFormField(
-          value: _credit.rutaId,
-          isDense: false,          
-          decoration: InputDecoration(
-              icon: Icon(FontAwesomeIcons.route, color: Colors.orange,), labelText: 'Zona/Ruta'),
-          onChanged: (v) {            
-            setState(() {
-              _credit.rutaId = v;  
-            });
-          },
-          items: _renderZones(user.zones),
-        );
-      },
-  );
-}
+  Widget _zones () {
+    return StoreConnector<AppState, dynamic>(
+        onInit: (store) => {
 
-List _renderZones (List<Zone> zones) {
+        },  
+        converter: (store) => store.state.user,
+        builder: (context, user) { 
+          return DropdownButtonFormField(          
+            value: _credit.rutaId == null ? 0 : _credit.rutaId,
+            itemHeight: 80,
+            isDense: true,                    
+            decoration: InputDecoration(
+                icon: Icon(FontAwesomeIcons.route, color: Colors.orange,), labelText: 'Zona/Ruta'),
+            onChanged: (v) {                     
+              setState(() {
+                _credit.rutaId = v;  
+              });
+            },          
+            items: _renderZones(user.zones),
+          );
+        },
+    );
+  }
+
+  List _renderZones (List<Zone> zones) {
     List<DropdownMenuItem<int>> lista = new List();
+    lista.add(DropdownMenuItem(
+      child: Text("Seleccione...", style: TextStyle(color: Colors.black26)),
+      value: 0,
+    ));
     zones.forEach((z) {
       lista
       ..add(DropdownMenuItem(

@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import 'dart:io';
 
+import 'package:paycapp/src/utils/utils.dart';
+
 Credit creditFromJson(String str) => Credit.fromJson(json.decode(str));
 
 String creditToJson(Credit data) => json.encode(data.toJson());
@@ -135,26 +137,65 @@ class Credit {
   }
 
   calcular() {
-    if(monto <= 0 )
+    if(monto == null || utilidad == null)
       return;
+    if(monto == 0)
+      return;
+      
     totalUtilidad = monto * (utilidad/100);
     total = monto + totalUtilidad;
+    pagosDeLast = 0;
 
     if(plazo == null || cobro == null )
       return;
-
+    //print("utl pago inicial: $pagosDeLast");
     npagos = (diasPlazo() / diasCobro()).toInt();
-    pagosDe = (total / npagos).roundToDouble();
-    print("#pagos $npagos | Cuotas: $pagosDe");
+    pagosDe = round((total / npagos), 2);
+    //print("#pagos $npagos | Cuotas: $pagosDe");
     double totalIdeal = pagosDe * npagos;
-    print("total $total == $totalIdeal");
+    //print("total $total == $totalIdeal");
     if(totalIdeal != total) {
       if (totalIdeal < total) {
         double diferencia = total - totalIdeal;
+        //print("$diferencia");
         pagosDeLast = pagosDe + diferencia;
+      } else {
+        double diferencia = totalIdeal - total;
+        pagosDeLast = pagosDe - diferencia;
       }
     }
+    dateEnd();
+  }
 
+  dateEnd() {
+    if(fInicio == null || cobro == null || plazo == null ) {
+      fFin = null;
+      return;
+    }
+    DateTime fechaFin = fInicio;
+    int diasCobro = this.diasPlazo();
+    if (diasCobro == 1){ 
+          if (fInicio.weekday == DateTime.saturday) {
+            fechaFin = fechaFin.add(new Duration(days: 2));
+          }
+          if (fInicio.weekday == DateTime.sunday) {
+            fechaFin = fechaFin.add(new Duration(days: 1));
+          }
+          if(fInicio.weekday != DateTime.saturday && fInicio.weekday != DateTime.sunday) {
+            fechaFin = fechaFin.add(new Duration(days: 1));
+          }
+    } else {
+        DateTime init = _remplaceWeekend(fInicio);        
+        fechaFin = init.add(new Duration(days: diasCobro));
+    }      
+    fFin = _remplaceWeekend(fechaFin);
+  }
+
+  _remplaceWeekend(DateTime date) {    
+    if(date.weekday == DateTime.sunday) {
+      date = date.add(new Duration(days: 1));
+    }
+    return date;
   }
 }
 /*

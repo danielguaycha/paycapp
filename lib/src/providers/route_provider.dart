@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/plugins/http.dart';
 
@@ -7,7 +8,7 @@ class RouteProvider {
 
   Future<dynamic> getRoutes() async {
  
-      Response res = await _http.get('/route');
+      Response res = await _http.get('/route', options: buildCacheOptions(Duration(hours: 2)));
       return Responser.fromJson(res.data);    
       
   }

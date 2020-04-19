@@ -13,7 +13,6 @@ import 'package:paycapp/src/models/person_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/models/ruta_model.dart';
 import 'package:paycapp/src/pages/client/list_client_page.dart';
-import 'package:paycapp/src/pages/client/search_client_delegate.dart';
 import 'package:paycapp/src/pages/routes/route_selection_page.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart' show customSnack;

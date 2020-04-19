@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -259,6 +260,13 @@ String dateTimetoString(DateTime currentTime) {
   return "${currentTime.year}-${currentTime.month}-${currentTime.day}";
 }
 
+String dateForHumans(DateTime currentTime) {
+  if(currentTime == null) {
+    return "__/__/__";
+  }
+  return "${currentTime.year}-${currentTime.month}-${currentTime.day}";
+}
+
 bool isNumeric(String s) {
   if (s == null) {
     return false;
@@ -288,14 +296,16 @@ Future<File> compressImg(File file) async {
     
     String finalPath = appDocPath+'/'+fileName+'.'+ext;
     
-    if(File(finalPath).existsSync()) {
-      return File(finalPath);
-    }
-
     var result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path, finalPath,
         quality: 88
     );    
     
     return result;
+  }
+
+  //* Round number
+  double round(double val, int places){ 
+   double mod = pow(10.0, places); 
+   return ((val * mod).round().toDouble() / mod); 
   }

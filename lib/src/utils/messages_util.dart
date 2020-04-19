@@ -55,19 +55,19 @@ Widget textOrLoader({bool loader: false, String loaderText: 'Procesando...', Str
   return Text(text, style: TextStyle(color: Colors.white));
 }
 
-Widget customSnack(String message, {String type: 'ok'}) {
+Widget customSnack(String message, {String type: 'ok', SnackBarAction action, int seconds = 4}) {
   SnackBar snack;
   switch(type.toLowerCase()){
     case 'ok':
-      snack = SnackBar(content: Text(message),
-        backgroundColor: Colors.green, elevation: 12, duration: Duration(seconds: 4));
+      snack = SnackBar(content: Text(message), action: action,
+        backgroundColor: Colors.green, elevation: 12, duration: Duration(seconds: 3));
       break;
     case 'err':
-      snack = SnackBar(content: Text(message),
-        backgroundColor: Colors.red, elevation: 12, duration: Duration(seconds: 5));
+      snack = SnackBar(content: Text(message),action: action,
+        backgroundColor: Colors.red, elevation: 12, duration: Duration(seconds: seconds));
       break;
     default:
-      snack = SnackBar(content: Text(message));
+      snack = SnackBar(content: Text(message), action: action);
       break;
   }
   return snack;

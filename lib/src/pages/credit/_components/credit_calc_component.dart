@@ -6,9 +6,10 @@ import 'package:paycapp/src/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 class CreditCalcComponent extends StatefulWidget {
-  CreditCalcComponent({Key key, this.credit}) : super(key: key);
 
   final Credit credit;
+
+  CreditCalcComponent({Key key, this.credit});
 
   @override
   _CreditCalcComponentState createState() => _CreditCalcComponentState();
@@ -16,21 +17,22 @@ class CreditCalcComponent extends StatefulWidget {
 
 class _CreditCalcComponentState extends State<CreditCalcComponent> {
   DateFormat formatter = new DateFormat('yyyy-MM-dd');
-
-  TextEditingController _controller = TextEditingController();
+  TextEditingController _txtMonto = TextEditingController();
+  TextEditingController _txtDate = new TextEditingController();
   Credit _credit;
+
   FocusNode _inputMonto = new FocusNode();
   FocusNode _node = new FocusNode();
-  TextEditingController _txtDate = new TextEditingController();
 
   @override
   void initState() {
     _credit = widget.credit;
-    _controller.value = TextEditingValue(text: _credit.monto.toString()); //
-    _txtDate.value = TextEditingValue(text: formatter.format(_credit.fInicio == null ? DateTime.now() : _credit.fInicio ));
+    _txtMonto.value = TextEditingValue(text: (_credit.monto != 0 ) ? _credit.monto.toString() : '0'); //
+    if(_credit.fInicio != null)
+      _txtDate.value = TextEditingValue(text: formatter.format(_credit.fInicio));
     _inputMonto.addListener(() {
       if(_inputMonto.hasFocus) {
-        _controller.selection = TextSelection(baseOffset:0, extentOffset:_controller.text.length);
+        _txtMonto.selection = TextSelection(baseOffset:0, extentOffset:_txtMonto.text.length);
       }
     });
     super.initState();
@@ -44,7 +46,8 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
 
   Widget _montoField() {
     return TextFormField(
-      controller: _controller,
+      controller: _txtMonto,    
+      autovalidate: true,
       focusNode: _inputMonto,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -65,7 +68,7 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
         if (!isNumeric(v)) {
           return "El monto ingresado no es válido";
         }
-        if (double.parse(v) <= 0) {
+        if (double.parse(v) < 0) {
           return 'El monto debe ser mayor a 0';
         }
         return null;
@@ -79,7 +82,7 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
             child: DropdownButtonFormField(
               value: _credit.plazo,
               isDense: true,
-              items: listItems(plazos),
+              items: listItems(plazos),              
               itemHeight: 50.0,
               decoration: InputDecoration(
                 icon: Icon(FontAwesomeIcons.calendarWeek, color: Colors.orange,),
@@ -154,17 +157,34 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
 
   // fecha
   Widget _crearInputDate(BuildContext context) {
-    return TextField(
-      enableInteractiveSelection: false,
-      controller:  _txtDate,
-      decoration: InputDecoration(
-          labelText: 'Fecha',
-          hintText: "Fecha",
-          icon: Icon(FontAwesomeIcons.calendarDay, color: Colors.orange)),
-      onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
-        _datePicker(context);
-      },
+    return Stack(
+      alignment: const Alignment(1.0, 0),    
+      children: <Widget>[
+        TextField(
+          enableInteractiveSelection: false,
+          controller:  _txtDate,
+          decoration: InputDecoration(
+              labelText: 'Fecha de Inicio',
+              helperText: (_credit.fInicio != null ? "El día que iniciarán los cobros" : "Dejar en blanco, si el prestamo se hace hoy"),
+              hintText: "Fecha ",
+              icon: Icon(FontAwesomeIcons.calendarDay, color: Colors.orange),               
+          ),    
+          onTap: () {
+            FocusScope.of(context).requestFocus(new FocusNode());
+            _datePicker(context);
+          },
+        ),
+        IconButton(
+        onPressed: _credit.fInicio != null ? () {
+          _credit.fInicio = null;
+          _txtDate.clear();
+          _credit.dateEnd();
+          setState(() {});
+        }: null,
+        icon: Icon(Icons.clear),
+        iconSize: 20.0,
+        )
+      ],
     );
   }
 
@@ -179,6 +199,7 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
     if (picked != null) {
         _credit.fInicio = picked;
         _txtDate.value = TextEditingValue(text: formatter.format(_credit.fInicio));
+       _credit.dateEnd();
     }
   }
 
@@ -186,19 +207,20 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
   Widget _calcContainer(context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-
-            _circleInfo("# Pagos", _credit.npagos, Colors.red[900]),
+            _circleInfo("# Pagos", _credit.npagos, Colors.red[900]),              
             _circleInfo("T. Utilidad", money(_credit.totalUtilidad), Colors.blueGrey[600]),
-
+            _circleInfo("Fecha de Fin", dateForHumans(_credit.fFin), Colors.black38),
           ],
         ),
         Column(
+          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             _circleInfo("Cuotas", money(_credit.pagosDe), Colors.blue,
                 extra: (_credit.pagosDeLast!=null) ? "${money(_credit.pagosDeLast)}" : ''
@@ -248,7 +270,7 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Form(
        child: Column(
          children: <Widget>[
            _montoField(),
@@ -260,9 +282,8 @@ class _CreditCalcComponentState extends State<CreditCalcComponent> {
            _comboUtilidad(context),
            SizedBox(height: 12),
            _crearInputDate(context),
-           SizedBox(height: 12),
-           _calcContainer(context),
-
+           SizedBox(height: 5),
+           _calcContainer(context),           
          ],
        ),
     );

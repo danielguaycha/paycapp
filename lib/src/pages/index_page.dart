@@ -27,11 +27,29 @@ class IndexPage extends StatelessWidget {
             ),
             _btn(
                 context,
+                icon: FontAwesomeIcons.users,
+                color: Colors.indigo,
+                text: 'Listado de Cliente',
+                click: (){
+                  Navigator.pushNamed(context, 'client_index');
+                }
+            ),
+            _btn(
+                context,
                 icon: FontAwesomeIcons.moneyBill,
                 color: Colors.blue[300],
                 text: 'Agregar Crédtito',
                 click: (){
                   Navigator.pushNamed(context, 'credit_add');
+                }
+            ),
+            _btn(
+                context,
+                icon: FontAwesomeIcons.calculator,
+                color: Colors.purple[300],
+                text: 'Calcular Crédtito',
+                click: (){
+                  Navigator.pushNamed(context, 'credit_calc');
                 }
             ),
           ],

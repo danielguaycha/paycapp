@@ -39,7 +39,7 @@ class AuthProvider {
 
 
   Future<Auth> getCompleteAuth() async {
-      Response response = await _http.get('/user', options: buildCacheOptions(Duration(days: 1)));
+      Response response = await _http.get('/user', options: buildCacheOptions(Duration(hours: 3)));
       return Auth.fromJson(json.encode(response.data['data']));
   }
 

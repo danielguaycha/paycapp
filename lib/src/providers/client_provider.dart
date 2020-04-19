@@ -46,4 +46,9 @@ class ClientProvider {
       return Responser.fromJson(res.data);       
   }
 
+  Future<Responser> list({int page: 1, limit: 10}) async {
+    Response res = await _http.get("/client?page=$page&limit=$limit}");
+    return Responser.fromJson(res.data);
+  }
+
 }
