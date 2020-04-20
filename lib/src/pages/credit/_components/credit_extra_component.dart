@@ -207,7 +207,7 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
   Widget _subtitle ({text: ''}) {
     return Row(
       children: <Widget>[
-        SizedBox(width: 40),
+        SizedBox(width: 5),
         Text("$text", style: TextStyle(fontSize: 12))
       ],
     );

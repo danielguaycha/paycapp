@@ -106,7 +106,7 @@ class Person {
     status: json["status"],
     mora: json["mora"],
     type: json["type"],
-    rank: json["rank"],
+    rank: int.parse(json["rank"]),
   );
 
   Map<String, dynamic> toMap() => {
