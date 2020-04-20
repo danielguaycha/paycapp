@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:paycapp/src/utils/utils.dart' show parseInt;
+
 class Auth {
   int id;
   dynamic emailVerifiedAt;
@@ -106,7 +108,7 @@ class Person {
     status: json["status"],
     mora: json["mora"],
     type: json["type"],
-    rank: int.parse(json["rank"]),
+    rank: parseInt(json["rank"]),
   );
 
   Map<String, dynamic> toMap() => {

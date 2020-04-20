@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:paycapp/src/utils/utils.dart' show parseInt;
+
 Person personFromJson(String str) => Person.fromJson(json.decode(str));
 
 String personToJson(Person data) => json.encode(data.toJson());
@@ -44,7 +46,7 @@ class Person {
     email: json["email"],
     status: json["status"],
     mora: json["mora"],
-    rank: int.parse(json["rank"] == null ? '0' : json["rank"]),
+    rank: parseInt(json["rank"]),
   );
 
   String toRawJson() => json.encode(toJson());
