@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:paycapp/src/models/credit_model.dart';
 import 'package:paycapp/src/models/responser.dart';
+import 'package:paycapp/src/models/show_credit_model.dart';
 import 'package:paycapp/src/plugins/http.dart';
 import 'package:paycapp/src/utils/utils.dart' show processError;
 //Other
@@ -52,12 +53,12 @@ class CreditProvider {
     }
   }
 
-  Future<dynamic> list({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null", String search = "null"}) async {
+  Future<dynamic> list({int page: 1, int ruta: 0, String plazo: "null", String cobros: "null", String search = "null"}) async {
     // if(search == "null"){
 
     String url = "/credit?page=$page";
     
-    url = (ruta !="null") ? url + "&ruta=$ruta" : url;
+    url = (ruta > 0) ? url + "&ruta=$ruta" : url;
     url = (plazo !="null") ? url + "&plazo=$plazo" : url;
     url = (cobros !="null") ? url + "&cobro=$cobros" : url;
     url = (search !="null") ? url + "&q=$search" : url;
@@ -81,7 +82,6 @@ class CreditProvider {
   
   //Listar pagos por dia
   Future<dynamic> listPaymentsForDay(String date) async {
-    print("Listando pagos...");
     String url = "/payment?&date="+date;
     Response res = await _http.get(url);
     return Responser.fromJson(res.data);
@@ -112,9 +112,9 @@ class CreditProvider {
 
 
   // Obtener un crédito por el id
-  Future<dynamic> getById(int id) async {
+  Future<ShowCredit> getById(int id) async {
     Response res = await _http.get('/credit/$id');
-    return Responser.fromJson(res.data);
+    return ShowCredit.fromJson(json.encode(res.data['data']));    
   }
 
   //Nuevo provider 31/03/2020
@@ -127,17 +127,11 @@ class CreditProvider {
     url = (cobros !="null") ? url + "&cobro=$cobros" : url;
 
     final resp = await _http.get(url);
+    //TODO: Esta variable para que se la usa ?
     final decodedData = json.decode(resp.data.toString());
 
     Response res = await _http.get(url);
     //return Responser.fromJson(res.data);
-
-
-
-    // final creditNews = CreditNews.fromJsonList(decodedData);
-    // print("DATA: $creditNews");
-    print("JSON");
-     print(res);
 
     return [];
     }

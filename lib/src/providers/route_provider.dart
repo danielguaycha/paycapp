@@ -8,7 +8,7 @@ class RouteProvider {
 
   Future<dynamic> getRoutes() async {
  
-      Response res = await _http.get('/route', options: buildCacheOptions(Duration(hours: 2)));
+      Response res = await _http.get('/route', options: buildCacheOptions(Duration(hours: 4)));
       return Responser.fromJson(res.data);    
       
   }

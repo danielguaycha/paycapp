@@ -16,7 +16,7 @@ Map<String, WidgetBuilder> getAppRoutes() {
     'client_add': (BuildContext context) => AddClientPage(),
     'client_index': (BuildContext context) => IndexClientPage(),
     'credit_add': (BuildContext context) => NewCreditPage(),
-    'credit_calc': (BuildContext context) => CalcCreditPage(),
+    'credit_calc': (BuildContext context) => CalcCreditPage(),    
     'map': (BuildContext context) => MapPage(),
     'expense_add': (BuildContext context) => AddExpensePage(),
   };

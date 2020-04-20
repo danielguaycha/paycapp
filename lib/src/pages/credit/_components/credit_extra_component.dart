@@ -361,10 +361,7 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
           onPressed: onRemove, 
           icon: Icon(Icons.delete)
         ),
-        leading: Hero(
-          tag: 'Daniel',
-          child: Image.file(img),
-        ),        
+        leading: Image.file(img),
         title: Text("$tag cargada"),
         subtitle: Text("${(img.lengthSync() / 1024).roundToDouble()} kb"),
       );
