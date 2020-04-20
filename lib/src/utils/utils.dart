@@ -9,6 +9,9 @@ import 'package:paycapp/src/config.dart' show urlApi;
 import 'package:paycapp/src/config.dart' show debug;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
+import 'package:flutter_advanced_networkimage/transition.dart';
+import 'package:flutter_advanced_networkimage/zoomable.dart';
 
 // Loader Component
 Widget loader({String text = 'Cargando...'}) {
@@ -277,7 +280,7 @@ String dateTimetoString(DateTime currentTime) {
 }
 
 String dateForHumans(DateTime currentTime) {
-  if(currentTime == null) {
+  if (currentTime == null) {
     return "__/__/__";
   }
   return "${currentTime.year}-${currentTime.month}-${currentTime.day}";
@@ -291,11 +294,32 @@ bool isNumeric(String s) {
 }
 
 Widget showImage(String urlImagen) {
-  return FadeInImage.assetNetwork(
-    fadeInCurve: Curves.decelerate,
-    image: getImagen(urlImagen),
-    placeholder: 'assets/img/load.gif',
+  bool _imageError = false;
+  return ZoomableWidget(
+    minScale: 0.3,
+    maxScale: 3.0,
+    // default factor is 1.0, use 0.0 to disable boundary
+    // panLimit: 0.5,
+    child: Container(
+      // width: double.minPositive,
+      // height: double.minPositive,
+      margin: EdgeInsets.all(0.0),
+      child: TransitionToImage(
+        image: AdvancedNetworkImage(getImagen(urlImagen),
+            timeoutDuration: Duration(seconds: 5)),
+        // This is the default placeholder widget at loading status,
+        // you can write your own widget with CustomPainter.
+        placeholder: _imageError ? Icon(Icons.message) : CircularProgressIndicator(),
+        // This is default duration
+        duration: Duration(milliseconds: 300),
+      ),
+    ),
   );
+  // return FadeInImage.assetNetwork(
+  //   fadeInCurve: Curves.decelerate,
+  //   image: getImagen(urlImagen),
+  //   placeholder: 'assets/img/load.gif',
+  // );
 }
 
 //* Comprimidor de imagenes
@@ -308,18 +332,17 @@ Future<File> compressImg(File file) async {
   String name = basename(file.path);
   String fileName = 'compress-' + name.split('.')[0];
   String ext = name.split('.').last;
-    
-  String finalPath = appDocPath+'/'+fileName+'.'+ext;
-    
+
+  String finalPath = appDocPath + '/' + fileName + '.' + ext;
+
   var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path, finalPath,
-      quality: 88
-  );      
+      quality: 88);
   return result;
 }
 
 //* Redondear numero
-double round(double val, int places){ 
-   double mod = pow(10.0, places); 
-  return ((val * mod).round().toDouble() / mod); 
+double round(double val, int places) {
+  double mod = pow(10.0, places);
+  return ((val * mod).round().toDouble() / mod);
 }

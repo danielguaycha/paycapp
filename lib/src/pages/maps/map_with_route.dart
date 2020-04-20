@@ -29,21 +29,21 @@ final double _yellow = 45.0;
 final double _green = 75.0;
 final double _reed = BitmapDescriptor.hueRed;
 // Variables para graficar la ruta del mapa
-Set<Polyline> _polyLines = {};
-LatLng _destination;
-String _wayPoints = "";
+// -- Set<Polyline> _polyLines = {};
+// -- LatLng _destination;
+// -- String _wayPoints = "";
 //Datos del cliente
-String _name = "";
-String _address = "";
 DataClient _dataClient = new DataClient("0.0", "0.0", "", "");
-
+String _category = 'DIARIO';
+// List<DataClient> _nuevocliente = List<DataClient>();
+// List<DataClient> _nuevoclienteresp = List<DataClient>();
 // Para almacenar la posicion actual
 LatLng _currentCoridinates;
 
 class _MapRoutePageState extends State<MapRoutePage> {
   // Para indicar en donde se enfocara la pantalla al inicar el mapa
   CameraPosition _initialCameraPosition;
-  double _zoomForMap = 15.0;
+  double _zoomForMap = 12.0;
   // Para definir los pines en el mapa
   Set<Marker> _markers = Set();
   // Para el widget flotante al hacer clic sobre un pin
@@ -59,11 +59,16 @@ class _MapRoutePageState extends State<MapRoutePage> {
 
   @override
   void initState() {
+    // _nuevoclienteresp = widget.cliente;
+    // for (var item in _nuevoclienteresp) {
+    //   _nuevocliente.add(item);
+    // }
     // TODO: implement initState
     super.initState();
-    _destination = null;
-    _wayPoints = "";
-    _polyLines = {};
+     // = widget.cliente;
+    // -- _destination = null;
+    // -- _wayPoints = "";
+    // -- _polyLines = {};
     //Este metodo carga todo lo necesario para cuando el ususario quiera ver una ruta
     // getCoordinates(widget.cliente);
   }
@@ -96,6 +101,21 @@ class _MapRoutePageState extends State<MapRoutePage> {
             //     }
             //   },
             // )
+            // Para ver la ruta en el mapa
+          // PopupMenuButton<String>(
+          //   onSelected: choiceAction,
+          //   itemBuilder: (BuildContext context) {
+          //     return choicesForPyments.map((String choice) {
+          //       return PopupMenuItem<String>(
+          //         value: choice,
+          //         child: Text(
+          //           choice.toUpperCase(),
+          //           style: TextStyle(fontWeight: FontWeight.bold),
+          //         ),
+          //       );
+          //     }).toList();
+          //   },
+          // ),
           ]),
       body: FutureBuilder<Position>(
         future: _getPosition(),
@@ -106,6 +126,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
           }
 
           return _map(snapshot.data, widget.cliente, context);
+          // return _map(snapshot.data, _nuevocliente, context);
         },
       ),
     );
@@ -122,10 +143,13 @@ class _MapRoutePageState extends State<MapRoutePage> {
 
     _currentCoridinates = LatLng(data.latitude, data.longitude);
 
+    if(listaClientes.length >= 1){
+
     _initialCameraPosition = CameraPosition(
         target:
-            LatLng(_currentCoridinates.latitude, _currentCoridinates.longitude),
+            LatLng(double.parse(listaClientes.first.lat), double.parse(listaClientes.first.lng)),
         zoom: _zoomForMap);
+    }
 
         // _controller.
 
@@ -134,10 +158,12 @@ class _MapRoutePageState extends State<MapRoutePage> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       position: _currentCoridinates,
       markerId: MarkerId('myOnlyId'),
-      // infoWindow: InfoWindow(title: "Tu ubicación"),
+      infoWindow: InfoWindow(title: "Tu ubicación"),
     ));
 
     for (var item in listaClientes) {
+      // if(item.cobro == _category){
+
       _locationClient = LatLng(double.parse(item.lat), double.parse(item.lng));
       _markers.add(new Marker(
         onTap: () {
@@ -152,6 +178,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
         markerId: MarkerId('$_locationClient'),
         // infoWindow: InfoWindow(title: "${item.name}", snippet: "${item.address}"),
       ));
+      // }
     }
 
     // Codigo para la paleta de colores
@@ -166,7 +193,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
     //     infoWindow: InfoWindow(title: "$i")
     //     ));
     // }
-
+    // print("Leng nuevo: ${_nuevocliente.length}");
     widget.cliente.clear();
 
     return Stack(
@@ -194,7 +221,8 @@ class _MapRoutePageState extends State<MapRoutePage> {
   }
 
   void _retry() {
-    print("Imprimiendo");
+
+    _markers.removeWhere((m) => m.markerId.value == 'myOnlyId');
     _markers.removeWhere((m) => m.markerId.value == 'myOnlyId');
     setState(() {});
   }
@@ -293,6 +321,10 @@ class _MapRoutePageState extends State<MapRoutePage> {
                     ]))));
   }
 
+  void choiceFilter(String choice) async {
+    _category = choice;
+
+  }
   void choiceAction(String choice) async {
     switch (choice) {
       case "cobrar":
@@ -500,131 +532,131 @@ class _MapRoutePageState extends State<MapRoutePage> {
   // }
 
   // obtener la ultima posicion de la lista
-  getCoordinates(List<DataClient> values) {
-    //Si la lista es mayor a cero ejecuto el metodo
-    if (values.length > 0) {
-      //Obtener el ultimo valor de la lista
-      _destination = new LatLng(double.parse(values[values.length - 1].lat),
-          double.parse(values[values.length - 1].lng));
-      //Eliminar el ultimo valor de la lista
-      // values.removeLast();
-      //Si quedan elementos en la lista, obtengo los puntos del camino de la ruta
-      if (values.length - 1 > 0) {
-        // _waypointsObtenidos = false;
-        getWaypoints(values);
-      } //else {
-      //   _waypointsObtenidos = true;
-      // }
-    }
-    return true;
-  }
+  // -- getCoordinates(List<DataClient> values) {
+  // --   //Si la lista es mayor a cero ejecuto el metodo
+  // --   if (values.length > 0) {
+  // --     //Obtener el ultimo valor de la lista
+  // --     _destination = new LatLng(double.parse(values[values.length - 1].lat),
+  // --         double.parse(values[values.length - 1].lng));
+  // --     //Eliminar el ultimo valor de la lista
+  // --     // values.removeLast();
+  // --     //Si quedan elementos en la lista, obtengo los puntos del camino de la ruta
+  // --     if (values.length - 1 > 0) {
+  // --       // _waypointsObtenidos = false;
+  // --       getWaypoints(values);
+  // --     } //else {
+  // --     //   _waypointsObtenidos = true;
+  // --     // }
+  // --   }
+  // --   return true;
+  // -- }
 
-  //Obtener los puntos medios para la consulta con el API de google
-  getWaypoints(List<DataClient> valuesClient) {
-    _wayPoints = "";
-    for (int i = 0; i < valuesClient.length - 1; i++) {
-      _wayPoints =
-          _wayPoints + "${valuesClient[i].lat},${valuesClient[i].lng}|";
-    }
-    // _waypointsObtenidos = true;
-    print("WP: $_wayPoints");
-    // return true;
-  }
-
-  // Esto lo copie del codigo de UberClone
-  // asi que ni idea como funciona,
-  // pero funciona
-  /////////////////////// INICIO TALLARIN //////////////////////////
-  // ! SEND REQUEST
-  void sendRequest(
-      {@required LatLng origen,
-      @required LatLng destino,
-      @required String puntos}) async {
-    print("Graficando... $origen ");
-    String route =
-        await _googleMapsServices.getRouteCoordinates(origen, destino, puntos);
-    createRoute(route);
-  }
-
-  // ! TO CREATE ROUTE
-  void createRoute(String encondedPoly) {
-    _polyLines.clear();
-    print("Pintar linea azul");
-    _polyLines.add(Polyline(
-        polylineId: PolylineId("1"),
-        width: 8,
-        geodesic: true,
-        points: _convertToLatLng(_decodePoly(encondedPoly)),
-        color: Colors.blue));
-    _retry();
-  }
-
-  List<LatLng> _convertToLatLng(List points) {
-    List<LatLng> result = <LatLng>[];
-    for (int i = 0; i < points.length; i++) {
-      if (i % 2 != 0) {
-        result.add(LatLng(points[i - 1], points[i]));
-      }
-    }
-    return result;
-  }
-
-  // !DECODE POLY
-  List _decodePoly(String poly) {
-    var list = poly.codeUnits;
-    var lList = new List();
-    int index = 0;
-    int len = poly.length;
-    int c = 0;
-    //repeating until all attributes are decoded
-    do {
-      var shift = 0;
-      int result = 0;
-
-      // for decoding value of one attribute
-      do {
-        c = list[index] - 63;
-        result |= (c & 0x1F) << (shift * 5);
-        index++;
-        shift++;
-      } while (c >= 32);
-      /* if value is negetive then bitwise not the value */
-      if (result & 1 == 1) {
-        result = ~result;
-      }
-      var result1 = (result >> 1) * 0.00001;
-      lList.add(result1);
-    } while (index < len);
-
-    /*adding to previous value as done in encoding */
-    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
-
-    return lList;
-  }
-
-  ///////////////////////  FIN TALLARIN  //////////////////////////
-  Future _displayText(BuildContext context, {@required String text}) async {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20))),
-          title: Text(
-            'AVISO',
-            textAlign: TextAlign.center,
-          ),
-          content: Text(text),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // -- //Obtener los puntos medios para la consulta con el API de google
+  // -- getWaypoints(List<DataClient> valuesClient) {
+  // --   _wayPoints = "";
+  // --   for (int i = 0; i < valuesClient.length - 1; i++) {
+  // --     _wayPoints =
+  // --         _wayPoints + "${valuesClient[i].lat},${valuesClient[i].lng}|";
+  // --   }
+  // --   // _waypointsObtenidos = true;
+  // --   print("WP: $_wayPoints");
+  // --   // return true;
+  // -- }
+ 
+  // -- // Esto lo copie del codigo de UberClone
+  // -- // asi que ni idea como funciona,
+  // -- // pero funciona
+  // -- /////////////////////// INICIO TALLARIN //////////////////////////
+  // -- // ! SEND REQUEST
+  // -- void sendRequest(
+  // --     {@required LatLng origen,
+  // --     @required LatLng destino,
+  // --     @required String puntos}) async {
+  // --   print("Graficando... $origen ");
+  // --   String route =
+  // --       await _googleMapsServices.getRouteCoordinates(origen, destino, puntos);
+  // --   createRoute(route);
+  // -- }
+ 
+  // -- // ! TO CREATE ROUTE
+  // -- void createRoute(String encondedPoly) {
+  // --   _polyLines.clear();
+  // --   print("Pintar linea azul");
+  // --   _polyLines.add(Polyline(
+  // --       polylineId: PolylineId("1"),
+  // --       width: 8,
+  // --       geodesic: true,
+  // --       points: _convertToLatLng(_decodePoly(encondedPoly)),
+  // --       color: Colors.blue));
+  // --   _retry();
+  // -- }
+ 
+  // -- List<LatLng> _convertToLatLng(List points) {
+  // --   List<LatLng> result = <LatLng>[];
+  // --   for (int i = 0; i < points.length; i++) {
+  // --     if (i % 2 != 0) {
+  // --       result.add(LatLng(points[i - 1], points[i]));
+  // --     }
+  // --   }
+  // --   return result;
+  // -- }
+ 
+  // -- // !DECODE POLY
+  // -- List _decodePoly(String poly) {
+  // --   var list = poly.codeUnits;
+  // --   var lList = new List();
+  // --   int index = 0;
+  // --   int len = poly.length;
+  // --   int c = 0;
+  // --   //repeating until all attributes are decoded
+  // --   do {
+  // --     var shift = 0;
+  // --     int result = 0;
+ 
+  // --     // for decoding value of one attribute
+  // --     do {
+  // --       c = list[index] - 63;
+  // --       result |= (c & 0x1F) << (shift * 5);
+  // --       index++;
+  // --       shift++;
+  // --     } while (c >= 32);
+  // --     /* if value is negetive then bitwise not the value */
+  // --     if (result & 1 == 1) {
+  // --       result = ~result;
+  // --     }
+  // --     var result1 = (result >> 1) * 0.00001;
+  // --     lList.add(result1);
+  // --   } while (index < len);
+ 
+  // --   /*adding to previous value as done in encoding */
+  // --   for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+ 
+  // --   return lList;
+  // -- }
+ 
+  // -- ///////////////////////  FIN TALLARIN  //////////////////////////
+  // -- Future _displayText(BuildContext context, {@required String text}) async {
+  // --   return showDialog(
+  // --     context: context,
+  // --     builder: (context) {
+  // --       return AlertDialog(
+  // --         shape: RoundedRectangleBorder(
+  // --             borderRadius: BorderRadius.all(Radius.circular(20))),
+  // --         title: Text(
+  // --           'AVISO',
+  // --           textAlign: TextAlign.center,
+  // --         ),
+  // --         content: Text(text),
+  // --         actions: <Widget>[
+  // --           FlatButton(
+  // --             child: Text('OK'),
+  // --             onPressed: () {
+  // --               Navigator.of(context).pop();
+  // --             },
+  // --           ),
+  // --         ],
+  // --       );
+  // --     },
+  // --   );
+  // -- }
 }

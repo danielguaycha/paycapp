@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:paycapp/src/config.dart';
 import 'package:paycapp/src/models/clientCredit_model.dart';
@@ -10,6 +11,7 @@ import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/providers/route_provider.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
+import '../../brain.dart';
 import '../maps/map_with_route.dart';
 
 //Variables
@@ -18,6 +20,7 @@ String category = 'diario';
 Ruta route;
 final _scaffoldKey = GlobalKey<ScaffoldState>();
 List<DataClient> _paymentsClients = new List<DataClient>();
+
 class ShowPaymentsPage extends StatefulWidget {
   ShowPaymentsPage({Key key}) : super(key: key);
 
@@ -29,15 +32,14 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
   @override
   void initState() {
     _fecha = _currentTime();
-    
+
     // _loadRoute().then((data){
     //   route = Ruta.fromJson(data.data);
     // });
-
+    _paymentsClients.clear();
     super.initState();
   }
 
-  bool _reload = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,9 +48,20 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
         title: Text("Cobros \t | \t $_fecha"),
         actions: <Widget>[
           // action button
-          IconButton(icon: Icon(Icons.map), onPressed: (){
-            Navigator.push(context, MaterialPageRoute( builder: (context) => MapRoutePage(cliente: _paymentsClients)));
-          },),
+          IconButton(
+            icon: Icon(Icons.map),
+            onPressed: () {
+              if (_paymentsClients.length <= 0) {
+                return null;
+              }
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MapRoutePage(cliente: _paymentsClients)));
+            },
+          ),
 
           IconButton(
             icon: Icon(Icons.calendar_today),
@@ -74,47 +87,36 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
       ),
       body: Column(
         children: <Widget>[
-           Expanded(
-             flex: 1,
-            //  child: ListView.builder(
-            //    scrollDirection: Axis.horizontal,
-            //    itemCount: 10,
-            //    itemBuilder: (context, int index){
-            //      return _boxRoute(contenido: index.toString());
-            //    },
-            //  ),
+          //  Expanded(
+          //    flex: 1,
+          //               child:
+          //       FutureBuilder(
+          //           future: RouteProvider().getRoutes(),
+          //           builder: (context, snapshot) {
+          //             if (snapshot.hasError) {
+          //               return renderError(snapshot.error, _retry);
+          //             }
 
+          //             if (!snapshot.hasData)
+          //               return loader(text: "Cargando rutas...");
 
-                        child: 
-                FutureBuilder(
-                    future: RouteProvider().getRoutes(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return renderError(snapshot.error, _retry);
-                      }
+          //             var results = snapshot.data.data;
+          //             if (results != null && results.length <= 0) {
+          //               return renderNotFoundData(
+          //                   "No tienes rutas asignadas aún");
+          //             }
 
-                      if (!snapshot.hasData)
-                        return loader(text: "Cargando rutas...");
-
-                      var results = snapshot.data.data;
-                      if (results != null && results.length <= 0) {
-                        return renderNotFoundData(
-                            "No tienes rutas asignadas aún");
-                      }
-
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: results.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          var route = Ruta.fromJson(results[index]);
-                          print("Name: ${route.name}");
-                          return _boxRoute(contenido: route.name);
-                        },
-                      );
-                    }),
-              
-
-           ),
+          //             return ListView.builder(
+          //               scrollDirection: Axis.horizontal,
+          //               itemCount: results.length,
+          //               itemBuilder: (BuildContext context, int index) {
+          //                 var route = Ruta.fromJson(results[index]);
+          //                 print("Name: ${route.name}");
+          //                 return _boxRoute(contenido: route.name);
+          //               },
+          //             );
+          //           }),
+          //  ),
 
           Expanded(
             flex: 6,
@@ -124,6 +126,30 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
       ),
     );
   }
+
+// Widget _zones () {
+//     return StoreConnector<AppState, dynamic>(
+//         onInit: (store) => {
+
+//         },
+//         converter: (store) => store.state.user,
+//         builder: (context, user) {
+//           return DropdownButtonFormField(
+//             value: _credit.rutaId == null ? 0 : _credit.rutaId,
+//             itemHeight: 80,
+//             isDense: true,
+//             decoration: InputDecoration(
+//                 icon: Icon(FontAwesomeIcons.route, color: Colors.orange,), labelText: 'Zona/Ruta'),
+//             onChanged: (v) {
+//               setState(() {
+//                 _credit.rutaId = v;
+//               });
+//             },
+//             items: _renderZones(user.zones),
+//           );
+//         },
+//     );
+//   }
 
   _loadRoute() async {
     var response = await RouteProvider().getRoutes();
@@ -138,10 +164,11 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
   Widget _futureBuilderPyments(context, _scaffoldKey) {
     return FutureBuilder(
       //lista del servidor
-      future: CreditProvider().listPaymentsForDay(_fecha),
+      future: _paymentsClients.length <= 0 ? CreditProvider().listPaymentsForDay(_fecha) : null,
 
       builder: (context, snapshot) {
         if (snapshot.hasError) {
+          print("Error");
           return renderError(snapshot.error, () {});
         }
 
@@ -152,20 +179,39 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
         if (results != null && results.length <= 0) {
           return renderNotFoundData("No tienes rutas asignadas aún");
         }
-        print("TAMANO: ${results[category].length}");
-        _loadResultsToList(results[category]);
-        _reload = false;
+        print("DATA: ${results[category].length}");
+
+            _paymentsClients.clear();
+
+        choicesForPyments.map((String choice) {
+          _loadResultsToList(results[choice]);
+        }).toList();
+
+          print("ELEMENTO: ${_paymentsClients.length}");
+        
         return Row(
           children: <Widget>[_lista(results[category], context, _scaffoldKey)],
         );
       },
     );
   }
-  void _loadResultsToList(results){
-    _paymentsClients.clear();
+
+  void _loadResultsToList(results) {
     for (int i = 0; i < results.length; i++) {
       var payment = results[i];
-    _paymentsClients.add(new DataClient(payment['lat'].toString(), payment['lon'].toString(), "${payment['client_name']}  ${payment['client_surname']} ", payment['address'], payment: true, cobro: payment['cobro'], status: payment['status'], idPayment: payment['id'], idCredit: payment['credit_id'] ));
+      _paymentsClients.add(new DataClient(
+          payment['lat'].toString(),
+          payment['lon'].toString(),
+          "${payment['client_name']}  ${payment['client_surname']} ",
+          payment['address'],
+          totalPago: payment['total'],
+          cobro: payment['cobro'],
+          status: payment['status'],
+          idPayment: payment['id'],
+          idCredit: payment['credit_id'],
+          ref_detail: payment['ref_detail'],
+          ref_img: payment['ref_img'],
+          payment: true,));
     }
   }
 
@@ -177,7 +223,6 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
       );
     }
 
-
     return Expanded(
         child: ListView.builder(
             scrollDirection: Axis.vertical,
@@ -186,25 +231,28 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
               var payment = results[index];
 
               return slideableForPyments(
-                  idPago: payment['id'].toString(),
-                  name: payment['client_name'],
-                  surname: payment['client_surname'],
-                  address: payment['address'],
-                  state: payment['status'].toString(),
-                  value: payment['total'].toString(),
-                  creditID: payment['credit_id'].toString(),
-                  refDetail: payment['ref_detail'],
-                  refImage: payment['ref_img'].toString(),
-                  lat: payment['lat'].toString(),
-                  lon: payment['lon'].toString(),
-                  cobro: payment['cobro'],
+                  // dataCliente: _paymentsClients[index], 
+                  dataCliente: new DataClient(
+                    payment['lat'].toString(),
+                    payment['lon'].toString(),
+                    "${payment['client_name']} ${payment['client_surname']}",
+                    payment['address'],
+                    idPayment: payment['id'],
+                    status: payment['status'],
+                    totalPago: payment['total'].toString(),
+                    idCredit: payment['credit_id'],
+                    ref_detail: payment['ref_detail'],
+                    ref_img: payment['ref_img'],
+                    cobro: payment['cobro'],
+                  ),
                   retry: _retry,
                   context: context,
                   scaffoldKey: scaffoldKey,
                   showDetail: true);
             }));
   }
-    String _getStatus(int status) {
+
+  String _getStatus(int status) {
     String st = 'pendiente';
     switch (status) {
       case 1:
@@ -226,7 +274,6 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     return st;
   }
 
-
   String _currentTime() {
     DateTime currentTime = new DateTime.now();
     return dateTimetoString(currentTime);
@@ -244,7 +291,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     if (picked != null) {
       setState(() {
         _fecha = dateTimetoString(picked);
-        _reload = true;
+        _paymentsClients.clear();
       });
     }
   }
@@ -253,12 +300,15 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     return Container(
       // color: colors['aaccent'],
       margin: EdgeInsets.all(10),
-          child: RaisedButton(
-            color: colors['accent'],
-            child: Text("$contenido", style: TextStyle(color: Colors.white),),
-            onPressed: (){},
-          ),
-        );
+      child: RaisedButton(
+        color: colors['accent'],
+        child: Text(
+          "$contenido",
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: () {},
+      ),
+    );
   }
 
   _retry() {

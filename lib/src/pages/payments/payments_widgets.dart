@@ -13,42 +13,46 @@ import 'list_payments_page.dart';
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 String reason = "";
 ProgressLoader _loader;
-
+DataClient dataClient;
 // Este metodo retorna un widget Slideable con toda la informacion necesaria para cobros
 Widget slideableForPyments({
-  String idPago,
-  String date,
-  String value,
-  String state,
-  String name,
-  String surname,
-  String address,
-  String creditID,
-  String refDetail,
-  String refImage,
-  String lat,
-  String lon,
-  String cobro,
+  @required DataClient dataCliente,
+
+  // String idPago,
+  // String date,
+  // String value,
+  // String state,
+  // String name,
+  // String surname,
+  // String address,
+  // String creditID,
+  // String refDetail,
+  // String refImage,
+  // String lat,
+  // String lon,
+  // String cobro,
+
   @required Function retry,
   @required context,
   @required scaffoldKey,
   @required bool showDetail,
 }) {
+  dataClient = dataCliente;
   _loader = new ProgressLoader(context);
   _scaffoldKey = scaffoldKey;
   Color _color = Colors.black54;
   String _state = "Pendiente";
-  if (state == "-1") {
+  if (dataClient.status == TYPE_MORA) {
     _color = Colors.red;
     _state = "En mora";
-  } else if (state == "2") {
+  } else if (dataClient.status == TYPE_PAGADO) {
     _color = Colors.green;
     _state = "Pagado";
   }
 
   double fontWeit = 20.0;
-  if ("$name - $surname".length > 25) fontWeit = 18.0;
-  if ("$name - $surname".length > 30) fontWeit = 17.0;
+  if ("${dataClient.name}".length > 25) fontWeit = 18.0;
+  if ("${dataClient.name}".length > 30) fontWeit = 17.0;
 
   return Slidable(
     actionPane: SlidableDrawerActionPane(),
@@ -65,14 +69,14 @@ Widget slideableForPyments({
                   ? Column(
                       children: <Widget>[
                         Text(
-                          money(value),
+                          money(dataClient.totalPago),
                           style: TextStyle(
                               fontSize: 18,
                               color: _color,
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "$date",
+                          "${dataClient.date}",
                           style: TextStyle(fontSize: 15, color: _color),
                         ),
                       ],
@@ -81,7 +85,7 @@ Widget slideableForPyments({
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          "$name - $surname",
+                          "${dataClient.name}",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               fontSize: fontWeit,
@@ -114,7 +118,7 @@ Widget slideableForPyments({
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      money(value),
+                      money(dataClient.totalPago),
                       textAlign: TextAlign.right,
                       style: TextStyle(
                           fontSize: 20,
@@ -135,50 +139,49 @@ Widget slideableForPyments({
       ),
       onLongPress: showDetail
           ? () {
+            // PhotoView(imageProvider: AssetImage('assets/payicon.png'));
               _callModalBotonsheet(context,
-                  textInfo: address,
-                  urlImage: refImage,
-                  refDetail: refDetail,
-                  lat: lat,
-                  lon: lon,
-                  name: name,
-                  surname: surname,
-                  address: address,
-                  status: int.parse(state),
-                  idCredit: creditID,
-                  cobro: cobro 
-              );
+                  urlImage: dataClient.ref_img,
+                  refDetail: dataClient.ref_detail,
+                  lat: dataClient.lat,
+                  lon: dataClient.lng,
+                  name: dataClient.name,
+                  address: dataClient.address,
+                  status: dataClient.status,
+                  idCredit: dataClient.idCredit.toString(),
+                  cobro: dataClient.cobro,
+                  idPayment: dataClient.idPayment);
             }
           : null,
     )),
     actions: <Widget>[
-      _slidePagar(state, idPago, context, retry),
-      _slideMora(state, idPago, context, retry),
+      _slidePagar(dataClient.status, dataClient.idPayment, context, retry),
+      _slideMora(dataClient.status, dataClient.idPayment, context, retry),
     ],
     secondaryActions: showDetail
-        ? twoElements(idPago, context, creditID, state)
-        : oneElement(idPago, context, state),
+        ? twoElements(dataClient.idPayment, context, dataClient.idCredit,
+            dataClient.status)
+        : oneElement(dataClient.idPayment, context, dataClient.status),
   );
 }
 
-Widget _slideMora(String state, String idPago, context, Function retry) {
+Widget _slideMora(int state, int idPago, context, Function retry) {
   return IconSlideAction(
     caption: 'Mora',
     color: Colors.red,
     icon: Icons.remove_circle_outline,
     onTap: () async {
-      if (int.parse(state) == TYPE_MORA) {
+      if (state == TYPE_MORA) {
         return null;
       }
 
-      if (int.parse(state) == TYPE_PAGADO) {
-        _scaffoldKey.currentState
-            .showSnackBar(customSnack("Esta pago ya fue procesado", type: 'err'));
+      if (state == TYPE_PAGADO) {
+        _scaffoldKey.currentState.showSnackBar(
+            customSnack("Esta pago ya fue procesado", type: 'err'));
         return null;
       }
 
-      String process = await updatePayment(
-          int.parse(idPago), TYPE_MORA, context,
+      String process = await updatePayment(idPago, TYPE_MORA, context,
           title: "Marcar en Mora",
           content: "¿Está seguro que desea marcar como mora este pago?");
       if (process != null) {
@@ -195,24 +198,26 @@ Widget _slideMora(String state, String idPago, context, Function retry) {
   );
 }
 
-Widget _slidePagar(String state, String idPago, context, Function retry) {
+Widget _slidePagar(int state, int idPago, context, Function retry) {
   return IconSlideAction(
     caption: 'Pagar',
     color: Colors.green,
     icon: Icons.payment,
     onTap: () async {
-      if (int.parse(state) == TYPE_PAGADO) {
+      if (state == TYPE_PAGADO) {
         return null;
       }
 
-      String process = await updatePayment(
-          int.parse(idPago), TYPE_PAGADO, context,
+      String process = await updatePayment(idPago, TYPE_PAGADO, context,
           title: "Realizar pago",
           content: "¿Está seguro de realizar este pago?");
       if (process != null) {
         if (process == "OK") {
+          print("OLD: ${dataClient.status}");
           _scaffoldKey.currentState
               .showSnackBar(customSnack("Pago confirmado"));
+          dataClient.status = TYPE_PAGADO;
+          print("NEW: ${dataClient.status}");
           retry();
         } else {
           _scaffoldKey.currentState
@@ -224,20 +229,19 @@ Widget _slidePagar(String state, String idPago, context, Function retry) {
 }
 
 // En caso de encontrarse en la lista de pagos en un credito se llama a este widget para tener la opcion de anular
-Widget _slideAnular(idPago, context, state) {
+Widget _slideAnular(int idPago, context, int state) {
   return IconSlideAction(
     caption: 'Anular',
     color: Theme.of(context).primaryColor,
     icon: Icons.delete,
     onTap: () async {
-      if (int.parse(state) == TYPE_MORA || int.parse(state) == TYPE_PENDIENTE) {
+      if (state == TYPE_MORA || state == TYPE_PENDIENTE) {
         _scaffoldKey.currentState.showSnackBar(
             customSnack("Solo se pueden anular pagos procesados", type: 'err'));
         return null;
       }
 
-      String process =
-          await cancelPaymentOnPayments(int.parse(idPago), context);
+      String process = await cancelPaymentOnPayments(idPago, context);
       if (process != null) {
         if (process == "OK") {
           _scaffoldKey.currentState
@@ -251,7 +255,7 @@ Widget _slideAnular(idPago, context, state) {
   );
 }
 
-Widget _slideVerDetalle(String creditID, context) {
+Widget _slideVerDetalle(int creditID, context) {
   return IconSlideAction(
     caption: 'Ver detalle',
     color: Colors.amber,
@@ -260,7 +264,7 @@ Widget _slideVerDetalle(String creditID, context) {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ListPaymentsPage(id: int.parse(creditID))));
+              builder: (context) => ListPaymentsPage(id: creditID)));
     },
   );
 }
@@ -274,7 +278,7 @@ List<Widget> oneElement(idPago, context, state) {
 
 // Como puede existir uno o dos iconos se crea esta lista para el caso de necesitar dos elementos
 // Llamado al elemento de la lista anterior
-List<Widget> twoElements(idPago, context, creditID, state) {
+List<Widget> twoElements(int idPago, context, int creditID, state) {
   List<Widget> list = new List<Widget>();
   list.add(_slideAnular(idPago, context, state));
   list.add(_slideVerDetalle(creditID, context));
@@ -283,17 +287,16 @@ List<Widget> twoElements(idPago, context, creditID, state) {
 
 // Llamar al modalBotonSheet
 _callModalBotonsheet(context,
-    {String textInfo,
-    String urlImage,
+    {String urlImage,
     String refDetail,
     String lat,
     String lon,
     String name,
-    String surname,
     String address,
     int status,
     String cobro,
-    String idCredit}) {
+    String idCredit,
+    int idPayment}) {
   showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -305,7 +308,7 @@ _callModalBotonsheet(context,
               title: Text("Información"),
               onTap: () {
                 Navigator.pop(context);
-                _displayText(context, text: textInfo);
+                _displayText(context, text: address);
               },
             ),
             ListTile(
@@ -313,7 +316,8 @@ _callModalBotonsheet(context,
               title: Text("Ubicacion"),
               onTap: () {
                 Navigator.pop(context);
-                gotToMap(context, lat, lon, "$name $surname", address, status, cobro, idCredit);
+                gotToMap(context, lat, lon, "$name", address, status, cobro,
+                    idCredit, idPayment);
               },
             ),
             ListTile(
@@ -321,6 +325,7 @@ _callModalBotonsheet(context,
               title: Text("Referencia"),
               onTap: () {
                 Navigator.pop(context);
+                // PhotoView(imageProvider: AssetImage('assets/payicon.png'));
                 _displayImage(context, url: urlImage, refDetail: refDetail);
               },
             ),
@@ -328,8 +333,6 @@ _callModalBotonsheet(context,
         );
       });
 }
-
-
 
 //Actualizar a mora
 Future<String> updatePayment(int id, int status, context,
@@ -440,15 +443,22 @@ Future _displayImage(BuildContext context,
     context: context,
     builder: (context) {
       return AlertDialog(
+        // contentPadding: EdgeInsets.all(0.0),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(20))),
-        title: Text(
+        title: Column(children: <Widget>[
+          Text(
           'Referencia',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[showImage(url), Text(refDetail)],
+        Text(refDetail),
+        ],),
+        content:  
+        Container(
+          width: 100.0,
+          height: 300.0,
+          child: 
+              showImage(dataClient.ref_img),
         ),
         actions: <Widget>[
           new FlatButton(
@@ -464,10 +474,14 @@ Future _displayImage(BuildContext context,
 }
 
 // Ir al mapa en base a la ubicacion de un pago
-void gotToMap(
-    context, String lat, String lon, String name, String address, int status, String cobro, String idCredit) {
+void gotToMap(context, String lat, String lon, String name, String address,
+    int status, String cobro, String idCredit, int idPayment) {
   List<DataClient> _dataClient = new List<DataClient>();
-  _dataClient.add(new DataClient(lat, lon, name, address, status: status, cobro: cobro, idCredit: int.parse(idCredit)));
+  _dataClient.add(new DataClient(lat, lon, name, address,
+      status: status,
+      cobro: cobro,
+      idCredit: int.parse(idCredit),
+      idPayment: idPayment));
   Navigator.push(
       context,
       MaterialPageRoute(

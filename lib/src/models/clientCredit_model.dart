@@ -1,4 +1,3 @@
-
 class DataClient {
   //--Informacion basica
   String lat;
@@ -14,11 +13,32 @@ class DataClient {
   bool payment;
   String cobro;
   int status;
+  String ref_detail;
+  String ref_img;
+  String totalPago;
+  int numeroPago;
+  String description;
+  int client_id;
+  String date;
+
   // Para asignar una distancia en el mapa
   double distancia;
 
   DataClient(String lat, String lng, String name, String address,
-      {String zone, double distancia, bool payment, String cobro, int status, int idPayment, int idCredit}) {
+      {String zone,
+      double distancia,
+      bool payment,
+      String cobro,
+      int status,
+      int idPayment,
+      int idCredit,
+      String ref_detail,
+      String ref_img,
+      String totalPago,
+      int numeroPago,
+      String description,
+      int client_id,
+      String date}) {
     this.lat = lat;
     this.lng = lng;
     this.name = name;
@@ -31,5 +51,12 @@ class DataClient {
     this.status = status;
     this.idPayment = idPayment;
     this.idCredit = idCredit;
+    this.ref_detail = ref_detail;
+    this.ref_img = ref_img;
+    this.totalPago = totalPago;
+    this.numeroPago = numeroPago;
+    this.description = description;
+    this.client_id = client_id;
+    this.date = date;
   }
 }

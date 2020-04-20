@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paycapp/src/models/clientCredit_model.dart';
 
 import 'package:paycapp/src/pages/payments/payments_widgets.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
@@ -28,7 +29,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     // _loader = new ProgressLoader(context);
 
     return Scaffold(
-      key: _scaffoldKey,
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Text("Historial de Cobros"),
         ),
@@ -55,59 +56,61 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   }
 
   Widget _bodyPayments(results) {
-    return  Column(
+    return Column(
+      children: <Widget>[
+        _labelClient(
+            contenido:
+                "${results['name']} ${results['surname']}".toUpperCase()),
+        Row(
           children: <Widget>[
-            _labelClient(
-                contenido:
-                    "${results['name']} ${results['surname']}".toUpperCase()),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: _mediumCircle(
-                      value: money(results['monto']), etiqueta: "Prestamo"),
-                ),
-                Expanded(
-                  child: _bigCircle(
-                      value: money(results['total']),
-                      etiqueta: "Total a pagar"),
-                ),
-                Expanded(
-                  child: _mediumCircle(
-                      value: "${results['utilidad']} %", etiqueta: "Interés"),
-                ),
-              ],
-            ),
-            Center(
-              child: _labelDetail(
-                  description:
-                      "${results['description']}"),
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: _labelInformation(
-                      contenido: money(results['total_pagado']),
-                      etiqueta: "Total pagado"),
-                ),
-                _line(),
-                Expanded(
-                  child: _labelInformation(
-                      contenido: "${results['n_pagos']}", etiqueta: "Pagos"),
-                ),
-              ],
+            Expanded(
+              child: _mediumCircle(
+                  value: money(results['monto']), etiqueta: "Prestamo"),
             ),
             Expanded(
-              child: _containerCards(etiqueta: "HISTORIAL DE PAGOS", results: results))
+              child: _bigCircle(
+                  value: money(results['total']), etiqueta: "Total a pagar"),
+            ),
+            Expanded(
+              child: _mediumCircle(
+                  value: "${results['utilidad']} %", etiqueta: "Interés"),
+            ),
           ],
-        );
+        ),
+        Center(
+          child: _labelDetail(description: "${results['description']}"),
+        ),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: _labelInformation(
+                  contenido: money(results['total_pagado']),
+                  etiqueta: "Total pagado"),
+            ),
+            _line(),
+            Expanded(
+              child: _labelInformation(
+                  contenido: "${results['n_pagos']}", etiqueta: "Pagos"),
+            ),
+          ],
+        ),
+        Expanded(
+            child: _containerCards(
+                etiqueta: "HISTORIAL DE PAGOS", results: results))
+      ],
+    );
   }
 
   Container _labelClient({
     String contenido: '',
   }) {
     double fontSize = 16.0;
-    if(contenido.length > 25){fontSize = 17.0;}
-    if(contenido.length > 30){fontSize = 15.0;}
+    if (contenido.length > 25) {
+      fontSize = 17.0;
+    }
+    if (contenido.length > 30) {
+      fontSize = 15.0;
+    }
 
     return Container(
       padding: EdgeInsets.all(0.0),
@@ -119,9 +122,13 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
             "Cliente: ",
             textAlign: TextAlign.right,
             style: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.w500, color: Colors.black54),
+                fontSize: fontSize,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54),
           ),
-          SizedBox(width: 5,),
+          SizedBox(
+            width: 5,
+          ),
           Text(
             "$contenido",
             textAlign: TextAlign.left,
@@ -143,7 +150,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white54,
-        border: Border.all(color: Colors.black26),    
+        border: Border.all(color: Colors.black26),
       ),
       child: Center(
         child: Column(
@@ -161,9 +168,9 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
               "$etiqueta",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 15, 
-                color: Colors.black38,          
-                fontWeight: FontWeight.w500),
+                  fontSize: 15,
+                  color: Colors.black38,
+                  fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -238,41 +245,42 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
     return Container(
         child: Column(
       children: <Widget>[
-        Divider(height: 1,)       ,
+        Divider(
+          height: 1,
+        ),
         Expanded(
           child: ListView.builder(
               scrollDirection: Axis.vertical,
               itemCount: results['payments'].length,
               itemBuilder: (context, index) {
                 var payment = results['payments'][index];
-                
+
                 return slideableForPyments(
-                    idPago: "${payment['id']}",
-                    date: "${payment['date']}",
-                    value: "${payment['total']}",
-                    state: "${payment['status']}",
-                    retry: _retry,
-                    context: context,
-                    scaffoldKey: _scaffoldKey,
-                    showDetail: false,
+                  dataCliente: new DataClient("", "", "", "",
+                      idPayment: payment['id'],
+                      date: payment['date'].toString(),
+                      totalPago: payment['total'].toString(),
+                      status: payment['status']),
+                  retry: _retry,
+                  context: context,
+                  scaffoldKey: _scaffoldKey,
+                  showDetail: false,
                 );
               }),
 
-              //   return _tarjeta(
-              //       id_pago: "${payment['id']}",
-              //       date: "${payment['date']}",
-              //       value: "${payment['total']}",
-              //       state: "${payment['status']}");
-              // }),
+          //   return _tarjeta(
+          //       id_pago: "${payment['id']}",
+          //       date: "${payment['date']}",
+          //       value: "${payment['total']}",
+          //       state: "${payment['status']}");
+          // }),
         ),
       ],
     ));
   }
 
-  _retry(){
-    setState(() {
-      
-    });
+  _retry() {
+    setState(() {});
   }
 
   // Slidable _tarjeta({String id_pago, String date, String value, String state}) {
@@ -346,7 +354,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //             // -1 sginfica que estara en mora
   //             bool process = await _updatePayment(int.parse(id_pago) , -1, context, title: "Marcar en Mora", content: "¿Está seguro que desea marcar como mora este pago?");
   //             if(process){
-  //               setState(() {                  
+  //               setState(() {
   //               });
   //             }
   //           },
@@ -379,7 +387,6 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //       ]);
   // }
 
-
   // //Actualizar a mora
   // Future<bool> _updatePayment(int id, int status, context, {String title, String content}) async {
   //   int isOk = await Alert.confirm(context,
@@ -390,11 +397,11 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //   }
   //   _loader.show(msg: "Actualizando...");
   //   Responser res = await CreditProvider().updatePayment(id, status);
-  //   if(res.ok) { 
+  //   if(res.ok) {
   //     _scaffoldKey.currentState
   //         .showSnackBar(customSnack("Actualizado con exito"));
   //   } else {
-  //     print("ERROR: ${res.message}");     
+  //     print("ERROR: ${res.message}");
   //     _scaffoldKey.currentState
   //         .showSnackBar(customSnack(res.message, type: 'err'));
   //   }
@@ -415,7 +422,7 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //         .showSnackBar(customSnack("No se ha podido anular este pago", type: 'err'));
   //     return false;
   //   }
-    
+
   //   await _displayDialog(context);
   //   _loader.show(msg : "Anulando crédito");
   //   Responser res = await CreditProvider().deletePayments(creditId, reason);
@@ -439,14 +446,14 @@ class _ListPaymentsPageState extends State<ListPaymentsPage> {
   //           content: TextField(
   //             controller: _textEditingController,
   //             decoration: InputDecoration(hintText: "Motivo"),
-  //             onChanged: (text) {                
+  //             onChanged: (text) {
   //               reason = text;
   //             },
   //           ),
   //           actions: <Widget>[
   //             new FlatButton(
   //               child: Text('Enviar'),
-  //               onPressed: () {                  
+  //               onPressed: () {
   //                 Navigator.of(context).pop();
   //               },
   //             )
