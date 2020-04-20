@@ -28,11 +28,9 @@ class ClientProvider {
   // store client 
   Future<Responser> store(Person client) async {
     try {
-      Response response = await _http.post('/client', data: client.toJson());
-      print(response.data.toString());
+      Response response = await _http.post('/client', data: client.toJson());      
       return Responser.fromJson(response.data);      
-    }  on DioError catch(e) {
-        print(e.message);             
+    }  on DioError catch(e) {        
         if(e.response != null) {
           return Responser.fromJson(e.response.data);                    
         } else{

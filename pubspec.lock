@@ -172,6 +172,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  flutter_pusher_client:
+    dependency: "direct main"
+    description:
+      name: flutter_pusher_client
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
   flutter_redux:
     dependency: "direct main"
     description:
@@ -308,6 +315,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
+  laravel_echo:
+    dependency: "direct main"
+    description:
+      name: laravel_echo
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.2"
   location_permissions:
     dependency: transitive
     description:

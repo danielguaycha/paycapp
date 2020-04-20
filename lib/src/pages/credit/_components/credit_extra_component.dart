@@ -248,6 +248,10 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
         },  
         converter: (store) => store.state.user,
         builder: (context, user) { 
+          if(user.zones == null) {
+            return Center(child: Text("No hay rutas disponibles", style: TextStyle(color: Colors.red)));
+          }          
+
           return DropdownButtonFormField(          
             value: _credit.rutaId == null ? 0 : _credit.rutaId,
             itemHeight: 80,
@@ -361,10 +365,7 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
           onPressed: onRemove, 
           icon: Icon(Icons.delete)
         ),
-        leading: Hero(
-          tag: 'Daniel',
-          child: Image.file(img),
-        ),        
+        leading: Image.file(img),
         title: Text("$tag cargada"),
         subtitle: Text("${(img.lengthSync() / 1024).roundToDouble()} kb"),
       );

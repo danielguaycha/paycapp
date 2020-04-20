@@ -4,7 +4,7 @@ class CreditNews{
   CreditNews.fromJsonList(List<dynamic> jsonList){
     if( jsonList == null ) return;
 
-    for(var item in jsonList){
+    for(var item in jsonList){ //? TODO: Para que se usa esto
       final creditNew = new CreditNew.fromJsonMap(item);
     }
   }
