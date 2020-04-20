@@ -195,11 +195,7 @@ class _AddCreditPageState extends State<AddCreditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text("DATOS BÁSICOS - CLIENTE - MONTO",
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 10,
-                  )),
+              Text("DATOS BÁSICOS - CLIENTE - MONTO",style: TextStyle(color: Colors.black54,fontSize: 10,)),
               SizedBox(height: 2),
               //Visibility(visible: !_enabled, child: Text('Seleccione un cliente', style: TextStyle(color: Colors.black26, fontWeight: FontWeight.w700))),
               _clientField(context),

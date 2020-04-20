@@ -248,6 +248,10 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
         },  
         converter: (store) => store.state.user,
         builder: (context, user) { 
+          if(user.zones == null) {
+            return Center(child: Text("No hay rutas disponibles", style: TextStyle(color: Colors.red)));
+          }          
+
           return DropdownButtonFormField(          
             value: _credit.rutaId == null ? 0 : _credit.rutaId,
             itemHeight: 80,

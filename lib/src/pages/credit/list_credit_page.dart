@@ -28,17 +28,20 @@ class ListCreditPage extends StatefulWidget {
 
 class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProviderStateMixin{
 
-  TextEditingController _textEditingController = new TextEditingController();
+  //* Controllers
+  TextEditingController _textEditingController = new TextEditingController();  
+  AnimationController _controller;
+
   String _reason = "";
   List<DataClient> _listClients = new List<DataClient>();
   ProgressLoader _loader;
-  AnimationController _controller;
   bool _actualizar = true;
+  bool _addPadding = false;
 
   @override
   void initState() {    
     _controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 100), value: 1.0);
+        vsync: this, duration: Duration(milliseconds: 100), value: 1.0);    
     super.initState();
   }
 
@@ -100,18 +103,28 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
           return renderNotFoundData("No hay creditos para mostrar");
         }
 
-        return ListView.separated(
-          separatorBuilder: (context, index) => Container(
-            height: 0.0,
-            width: 0.0,
-          ),
-          itemCount: results.length,
-          itemBuilder: (BuildContext context, int index) {
-            var credit = (results[index]);
-            return _elements(context, credit, results, index);
-          },
-        );
+        return _buildList(results);
       },
+    );
+  }
+
+  Widget _buildList(results) {
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: ListView.separated(
+            separatorBuilder: (context, index) => Container(
+              height: 0.0,
+              width: 0.0,
+            ),
+            itemCount: results.length,
+            itemBuilder: (BuildContext context, int index) {
+              var credit = (results[index]);
+              return _elements(context, credit, results, index);
+            },
+          ),
+        ),        
+      ],
     );
   }
 
@@ -144,7 +157,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
           IconSlideAction(
             caption: 'Mas Info',
             color: Colors.indigo,
-            iconWidget: Icon(FontAwesomeIcons.info, color: Colors.white),
+            iconWidget: Icon(FontAwesomeIcons.info, color: Colors.white, size: 20),
             foregroundColor: Colors.white,
             onTap: () {
               Navigator.push(
@@ -156,7 +169,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
           IconSlideAction(
             caption: 'Ubicación',
             color: Colors.blue,
-            icon: FontAwesomeIcons.mapMarkerAlt,
+            iconWidget: Icon(FontAwesomeIcons.mapMarkerAlt, color: Colors.white, size: 20),
             onTap: () async {
               List<DataClient> _dataClient = new List<DataClient>();
               _dataClient.add(new DataClient( credit['geo_lat'], credit['geo_lon'], "${credit['name']}  ${credit['surname']}", credit['address'], zone: credit['ruta'] ));
@@ -223,7 +236,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     return true;
   }
 
-  _retry() {
+    _retry() {
     //locations.clear();
     setState(() {});
   }
@@ -436,6 +449,9 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
         },  
         converter: (store) => store.state.user,
         builder: (context, user) { 
+          if(user.zones == null) {
+            return Center(child: Text("No hay rutas disponibles", style: TextStyle(color: Colors.red)));
+          }
           return DropdownButtonFormField(          
             value: _valorRuta,
             decoration: InputDecoration(

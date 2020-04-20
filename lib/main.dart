@@ -17,8 +17,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux_logging/redux_logging.dart';
-import 'package:laravel_echo/laravel_echo.dart';
-import 'package:flutter_pusher_client/flutter_pusher.dart';
+//import 'package:laravel_echo/laravel_echo.dart';
+//import 'package:flutter_pusher_client/flutter_pusher.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -53,8 +53,7 @@ class _MyAppState extends State<MyApp> {
   final _prefs = new LocalStorage();
 
   @override
-  void initState() {
-    // TODO: implement initState
+  void initState() {    
     _initUser();
     _subscribe();
     super.initState();
@@ -117,9 +116,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   _subscribe() {
+      //TODO: Mejorar esta implementación de pusher combinado con el server
       if(_prefs.token == null) return;
       
-      var options = PusherOptions(host: '192.168.1.60', port: 6001, encrypted: false);
+      /* var options = PusherOptions(host: '192.168.1.60', port: 6001, encrypted: false);
       FlutterPusher pusher = FlutterPusher('ba32e61a4ec931ef457b', options, enableLogging: true);
 
       Echo echo = new Echo({
@@ -129,7 +129,7 @@ class _MyAppState extends State<MyApp> {
 
       echo.channel('home').listen('.my-event', (e) {
         print(e);
-      });
+      }); */
       //echo.socket.on('connect', (_) => print('connect'));
       //echo.socket.on('disconnect', (_) => print('disconnect')); 
   }

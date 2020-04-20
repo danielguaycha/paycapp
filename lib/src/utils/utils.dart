@@ -322,7 +322,7 @@ double parseDouble(dynamic number) {
   if(number==null)
     return 0.0;
   if (number is double)
-    return number;
+    return number.toDouble();
   return double.parse("$number");
 }
 
@@ -330,7 +330,7 @@ int parseInt(dynamic number) {
   if(number==null)
     return 0;
   if (number is int)
-    return number;
+    return number.toInt();
   return int.parse("$number");
 }
 

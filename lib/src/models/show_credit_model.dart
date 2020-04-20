@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'package:paycapp/src/models/prenda_model.dart';
+import 'package:paycapp/src/utils/utils.dart' show parseDouble, parseInt;
 
 class ShowCredit {
     int id;
@@ -72,7 +73,7 @@ class ShowCredit {
 
     factory ShowCredit.fromMap(Map<String, dynamic> json) => ShowCredit(
         id: json["id"],
-        utilidad: double.parse(json["utilidad"]),
+        utilidad: parseDouble(json["utilidad"]),
         plazo: json["plazo"],
         cobro: json["cobro"],
         status: json["status"],
@@ -81,11 +82,11 @@ class ShowCredit {
         refImg: json["ref_img"],
         refDetail: json["ref_detail"],
         monto: json["monto"],
-        totalUtilidad: double.parse("${json["total_utilidad"]}"),
-        total: double.parse("${json["total"]}"),
-        pagosDe: json["pagos_de"].toDouble(),
-        pagosDeLast: json["pagos_de_last"].toDouble(),
-        nPagos: json["n_pagos"],
+        totalUtilidad: parseDouble("${json["total_utilidad"]}"),
+        total: parseDouble("${json["total"]}"),
+        pagosDe: parseDouble(json["pagos_de"]),
+        pagosDeLast: parseDouble(json["pagos_de_last"]),
+        nPagos: parseInt(json["n_pagos"]),
         geoLat: json["geo_lat"],
         geoLon: json["geo_lon"],
         rutaId: json["ruta_id"],
@@ -131,6 +132,18 @@ class ShowCredit {
         "client_address": clientAddress,
         "prenda": List<dynamic>.from(prenda.map((x) => x.toMap())),
     };
+
+    String getStatus() {
+      if(this.status == null) return "";
+
+      switch(this.status) {
+        case 0: return "ANULADO";
+        case 1: return "ACTIVO";
+        case 2: return "FINALIZADO";                
+      }
+
+      return "";
+    }
 }
 
 
