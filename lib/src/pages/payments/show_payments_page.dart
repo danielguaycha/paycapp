@@ -204,7 +204,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
           payment['lon'].toString(),
           "${payment['client_name']}  ${payment['client_surname']} ",
           payment['address'],
-          totalPago: payment['total'],
+          totalPago: "${payment['total']}",
           cobro: payment['cobro'],
           status: payment['status'],
           idPayment: payment['id'],

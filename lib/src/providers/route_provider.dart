@@ -6,10 +6,8 @@ import 'package:paycapp/src/plugins/http.dart';
 class RouteProvider {
   final _http = HttpClient().dio;
 
-  Future<dynamic> getRoutes() async {
- 
-      Response res = await _http.get('/route', options: buildCacheOptions(Duration(hours: 4)));
-      return Responser.fromJson(res.data);    
-      
+  Future<dynamic> getRoutes() async { 
+      Response res = await _http.get('/route', options: buildCacheOptions(Duration(hours: 8)));
+      return Responser.fromJson(res.data);          
   }
 }

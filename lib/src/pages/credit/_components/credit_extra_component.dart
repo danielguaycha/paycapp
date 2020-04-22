@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:expandable/expandable.dart';
@@ -9,7 +10,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:paycapp/src/brain.dart';
 import 'package:paycapp/src/models/auth_model.dart';
 import 'package:paycapp/src/models/credit_model.dart';
+import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/pages/maps/map_only_page.dart';
+import 'package:paycapp/src/providers/route_provider.dart';
 import 'package:paycapp/src/utils/utils.dart';
 
 class CreditExtraComponent extends StatefulWidget {
@@ -30,6 +33,8 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
   TextEditingController _txtRef = TextEditingController();
 
   bool _geoloc = true;
+  List<Zone> _zonesList = new List();
+  bool _loaderZones;
 
   // Mostrar loaders al cargar imagenes
   bool _loaderRef = false;
@@ -37,6 +42,7 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
 
   @override
   void initState() {
+    this._loadZones();
     _credit = widget.credit;
     _geoloc = (_credit.geoLat == null ) ? widget.geoLoc : false;    
     _txtAdress.value = TextEditingValue(text: (_credit.address != null ? _credit.address : ''));
@@ -242,46 +248,41 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
   //*=== Zonas ===
 
   Widget _zones () {
-    return StoreConnector<AppState, dynamic>(
-        onInit: (store) => {
+    if(_loaderZones == true) {
+      return miniLoader();
+    }
 
-        },  
-        converter: (store) => store.state.user,
-        builder: (context, user) { 
-          if(user.zones == null) {
-            return Center(child: Text("No hay rutas disponibles", style: TextStyle(color: Colors.red)));
-          }          
-
-          return DropdownButtonFormField(          
-            value: _credit.rutaId == null ? 0 : _credit.rutaId,
-            itemHeight: 80,
-            isDense: true,                    
-            decoration: InputDecoration(
-                icon: Icon(FontAwesomeIcons.route, color: Colors.orange,), labelText: 'Zona/Ruta'),
-            onChanged: (v) {                     
-              setState(() {
-                _credit.rutaId = v;  
-              });
-            },          
-            items: _renderZones(user.zones),
-          );
-        },
-    );
+    return DropdownButtonFormField(          
+      value: _credit.rutaId == null ? 0 : _credit.rutaId,
+      itemHeight: 80,
+      isDense: true,                    
+      decoration: InputDecoration(
+          icon: Icon(FontAwesomeIcons.route, color: Colors.orange,), labelText: 'Zona/Ruta'),
+      onChanged: (v) {                     
+        setState(() {
+          _credit.rutaId = v;  
+        });
+      },          
+      items: _renderZones(),
+    );    
   }
 
-  List _renderZones (List<Zone> zones) {
+  List _renderZones () {
     List<DropdownMenuItem<int>> lista = new List();
     lista.add(DropdownMenuItem(
       child: Text("Seleccione...", style: TextStyle(color: Colors.black26)),
       value: 0,
     ));
-    zones.forEach((z) {
-      lista
-      ..add(DropdownMenuItem(
-        child: Text('${z.name}'),
-        value: z.id,
-      ));
-    });
+    if(_zonesList != null && _zonesList.length > 0) {
+      _zonesList.forEach((z) {
+        lista
+        ..add(DropdownMenuItem(
+          child: Text('${z.name}'),
+          value: z.id,
+        ));
+      });
+    } 
+    
     return lista;
   }
 
@@ -402,6 +403,21 @@ class _CreditExtraComponentState extends State<CreditExtraComponent> {
     setState(() {});
   }
 
+  //* Cargar las zonas
+  _loadZones() async { 
+      setState(() {
+        _loaderZones = true;
+      });
+      Responser res = await RouteProvider().getRoutes();
+      if(res.ok) {
+        for(var i=0; i<res.data.length; i++) {        
+          _zonesList.add(Zone.fromMap(res.data[i]));
+        }
+      }
+      setState(() {
+        _loaderZones = false;
+      });
+  }
 }
 
 

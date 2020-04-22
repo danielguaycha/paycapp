@@ -1,8 +1,12 @@
+import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:paycapp/src/models/responser.dart';
+import 'package:paycapp/src/models/updater_model.dart';
 import 'package:paycapp/src/pages/user/change_password_page.dart';
 import 'package:paycapp/src/plugins/http.dart';
+import 'package:paycapp/src/providers/updater_provider.dart';
 import 'package:paycapp/src/utils/local_storage.dart';
 
 import '../../config.dart';
@@ -14,6 +18,15 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   final _prefs = LocalStorage();
+  String _version;
+
+  @override
+  void initState() {
+    this._version = "";
+    this._comprobateUpdates();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,13 +54,25 @@ class _UserPageState extends State<UserPage> {
                 child: Column(
               children: <Widget>[Text("Nombre Apellido"), Text("UserName")],
             )),
+            SizedBox(height: 10),
+            _updateBtns(),
             Divider(color: Colors.transparent),
             _botton("Cambiar Contraseña", _changePassword),
             Divider(color: Colors.transparent),
             _botton("Cerrar Sesión", _logOut),
+            
           ],
         ),
       );
+  }
+
+  Widget _updateBtns() {
+    if(_prefs.update) {
+      return _botton("Actualizar $appName-${_version == '' ? '...' : _version}", (){});
+    }
+    else {
+      return _botton("Comprobar Actualizaciones", _comprobateUpdates);
+    }
   }
 
   Widget _landscapeView(){
@@ -77,10 +102,12 @@ class _UserPageState extends State<UserPage> {
             // Divider(color: Colors.transparent),
             Expanded(
               child: Column(
-                children: <Widget>[
+                children: <Widget>[                                  
+                  SizedBox(height: 15),
                   _botton("Cambiar Contraseña", _changePassword),
                   Divider(color: Colors.transparent),
-                  _botton("Cerrar Sesión", _logOut),
+                  _botton("Cerrar", _logOut),
+                  
                 ],
               ),
             ),          ],
@@ -111,12 +138,12 @@ class _UserPageState extends State<UserPage> {
   Widget _botton(String text, Function callBack) {
     return SizedBox(      
       width: double.maxFinite,
-      child: RaisedButton(
+      child: FlatButton(
           child: Text(
             text,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
-          splashColor: colors['accent'],
+          splashColor: Colors.white24,
           shape: StadiumBorder(),
           color: colors['primary'],
           onPressed: () {
@@ -136,5 +163,20 @@ class _UserPageState extends State<UserPage> {
     _client.clearCachePrimary('/user');
     _client.clearCachePrimary("/route");
     Navigator.pushReplacementNamed(context, 'login');
+  }
+
+  void _comprobateUpdates() async{
+      Responser res = await UpdaterProvider().comprobate();
+      if(res.ok) {
+        Updater u = Updater.fromMap(res.data);
+        if(u.update == true) {
+          _prefs.update = true;
+          this._version = u.version;          
+        } else {
+          Alert.toast(context, "No hay actualizaciones disponibles", position: ToastPosition.center, duration: ToastDuration.long);
+          _prefs.update = false;
+        }
+        setState(() {});
+      }
   }
 }

@@ -25,6 +25,14 @@ class LocalStorage {
     _prefs.setString("token", token);
   }
 
+  set update(bool haveUpdate) {
+    _prefs.setBool("update", haveUpdate);
+  }
+
+  get update {
+    return _prefs.getBool("update") ?? false;
+  }
+
   set user (User u) {
     if(u == null)
       _prefs.remove('user');
