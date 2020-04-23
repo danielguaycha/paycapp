@@ -30,24 +30,25 @@ import 'package:redux_logging/redux_logging.dart';
 GetIt locator = GetIt.instance;
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await FlutterDownloader.initialize(debug: true);
-
+  WidgetsFlutterBinding.ensureInitialized();  
+  
   final store = Store<AppState>(
       reducer,
       initialState: new AppState(user: null),
-      middleware: [thunkMiddleware, new LoggingMiddleware.printer()],    
+      middleware: [thunkMiddleware, /* new LoggingMiddleware.printer() */],    
   );  
-
   await LocalStorage().initPrefs();
   locator.registerLazySingleton(() => NavigationService());  
-
+  await FlutterDownloader.initialize(debug: false);
   runApp(
-      StoreProvider(store: store, child: new AlertProvider(
+    StoreProvider(
+      store: store, 
+      child: new AlertProvider(
         child: new MyApp(store: store),
         config: new AlertConfig(ok: "SI", cancel: "CANCELAR", useIosStyle: false),
       )
-  ));
+    )
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -61,10 +62,10 @@ class _MyAppState extends State<MyApp> {
   final _prefs = new LocalStorage();
 
   @override
-  void initState() {    
+  void initState() {        
     _initUser();
     _subscribe();
-    _checkPermission();    
+    _checkPermission();        
     super.initState();
   }
 
@@ -74,7 +75,7 @@ class _MyAppState extends State<MyApp> {
     }        
     return false;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
