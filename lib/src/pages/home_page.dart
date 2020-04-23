@@ -1,8 +1,4 @@
-import 'dart:io';
-
-import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:paycapp/src/pages/credit/list_credit_page.dart';
 import 'package:paycapp/src/pages/expense/list_expense_page.dart';
 import 'package:paycapp/src/pages/index_page.dart';
@@ -40,23 +36,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _pageController.dispose();
     super.dispose();
   }
-  DateTime backbuttonpressedTime;
+
   @override
   Widget build(BuildContext context) {
-    
-
     return Scaffold(
       //body: _children[_currentIndex], // new
-      body: WillPopScope(
-        onWillPop: onWillPop,
-        child: SizedBox.expand(
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() => _currentIndex = index);
-            },
-            children: _children
-          ),
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => _currentIndex = index);
+          },
+          children: _children
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -101,18 +92,5 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _pageController.animateToPage(index,
           duration: Duration(milliseconds: 10), curve: Curves.decelerate);
     });
-  }
-
-  Future<bool> onWillPop() async {
-    DateTime currentTime = DateTime.now();
-    //Statement 1 Or statement2
-    bool backButton = backbuttonpressedTime == null ||
-        currentTime.difference(backbuttonpressedTime) > Duration(seconds: 3);
-    if (backButton) {
-      backbuttonpressedTime = currentTime;
-      Alert.toast(context, "Presione otra vez para cerrar la app", duration: ToastDuration.long);      
-      return false;
-    }    
-    return true;
   }
 }
