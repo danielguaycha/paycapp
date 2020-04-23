@@ -1,3 +1,4 @@
+import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:paycapp/src/pages/credit/list_credit_page.dart';
 import 'package:paycapp/src/pages/expense/list_expense_page.dart';
@@ -16,6 +17,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final prefs = new LocalStorage();
   int _currentIndex = 0;
   PageController _pageController;
+  DateTime backbuttonpressedTime;
 
   final List<Widget> _children = [
     IndexPage(),
@@ -41,13 +43,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       //body: _children[_currentIndex], // new
-      body: SizedBox.expand(
-        child: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() => _currentIndex = index);
-          },
-          children: _children
+      body: WillPopScope(
+        onWillPop: onWillPop,
+        child: SizedBox.expand(
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _currentIndex = index);
+            },
+            children: _children
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -92,5 +97,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _pageController.animateToPage(index,
           duration: Duration(milliseconds: 10), curve: Curves.decelerate);
     });
+  }
+
+  Future<bool> onWillPop() async {
+    DateTime currentTime = DateTime.now();
+    //Statement 1 Or statement2
+    bool backButton = backbuttonpressedTime == null ||
+        currentTime.difference(backbuttonpressedTime) > Duration(seconds: 3);
+    if (backButton) {
+      backbuttonpressedTime = currentTime;
+      Alert.toast(context, "Presione otra vez para cerrar la app", duration: ToastDuration.long);      
+      return false;
+    }    
+    return true;
   }
 }

@@ -22,6 +22,7 @@ class DownloadPage extends StatefulWidget {
 }
 
 class _DownloadPageState extends State<DownloadPage> {
+
   final _prefs = LocalStorage();
   Updater _update;
   bool _loadingInfo;

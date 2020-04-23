@@ -29,7 +29,7 @@ class IndexPage extends StatelessWidget {
                 context,
                 icon: FontAwesomeIcons.users,
                 color: Colors.indigo,
-                text: 'Listado de Cliente',
+                text: 'Listado de Clientes',
                 click: (){
                   Navigator.pushNamed(context, 'client_index');
                 }
@@ -38,7 +38,7 @@ class IndexPage extends StatelessWidget {
                 context,
                 icon: FontAwesomeIcons.moneyBill,
                 color: Colors.blue[300],
-                text: 'Agregar Crédtito',
+                text: 'Agregar Crédito',
                 click: (){
                   Navigator.pushNamed(context, 'credit_add');
                 }
@@ -47,7 +47,7 @@ class IndexPage extends StatelessWidget {
                 context,
                 icon: FontAwesomeIcons.calculator,
                 color: Colors.purple[300],
-                text: 'Calcular Crédtito',
+                text: 'Calcular Crédito',
                 click: (){
                   Navigator.pushNamed(context, 'credit_calc');
                 }

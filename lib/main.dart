@@ -29,10 +29,9 @@ import 'package:redux_logging/redux_logging.dart';
 
 GetIt locator = GetIt.instance;
 
-void main() async {
+void main() async {  
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterDownloader.initialize(debug: true);
-
+  
   final store = Store<AppState>(
       reducer,
       initialState: new AppState(user: null),
@@ -41,6 +40,7 @@ void main() async {
 
   await LocalStorage().initPrefs();
   locator.registerLazySingleton(() => NavigationService());  
+  await FlutterDownloader.initialize(); 
 
   runApp(
       StoreProvider(store: store, child: new AlertProvider(
