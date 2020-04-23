@@ -2,6 +2,7 @@ import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/models/updater_model.dart';
 import 'package:paycapp/src/pages/user/change_password_page.dart';
@@ -23,7 +24,6 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     this._version = "";
-    this._comprobateUpdates();
     super.initState();
   }
 
@@ -68,7 +68,9 @@ class _UserPageState extends State<UserPage> {
 
   Widget _updateBtns() {
     if(_prefs.update) {
-      return _botton("Actualizar $appName-${_version == '' ? '...' : _version}", (){});
+      return _botton("Actualizar $appName-${_version == '' ? '...' : _version}", (){
+        Navigator.pushNamed(context, 'download');
+      });
     }
     else {
       return _botton("Comprobar Actualizaciones", _comprobateUpdates);
@@ -172,9 +174,14 @@ class _UserPageState extends State<UserPage> {
         if(u.update == true) {
           _prefs.update = true;
           this._version = u.version;          
-        } else {
+        } else {          
           Alert.toast(context, "No hay actualizaciones disponibles", position: ToastPosition.center, duration: ToastDuration.long);
           _prefs.update = false;
+          
+          final tasks = await FlutterDownloader.loadTasks();      
+          tasks?.forEach((task) {  
+            FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: true);
+          });
         }
         setState(() {});
       }

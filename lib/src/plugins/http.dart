@@ -16,8 +16,8 @@ class HttpClient {
     _cacheManager = DioCacheManager(CacheConfig(baseUrl: urlApi, databaseName: 'paycenter.db'));
     dio = new Dio(new BaseOptions(
         baseUrl: urlApi,
-        connectTimeout: 5000,
-        receiveTimeout: 5000,
+        connectTimeout: 120000,
+        receiveTimeout: 120000,
         headers: {
           "Accept": 'application/json'
         },

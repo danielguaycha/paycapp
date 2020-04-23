@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:paycapp/src/pages/client/index_client_page.dart';
 import 'package:paycapp/src/pages/credit/calc_credit_page.dart';
 import 'package:paycapp/src/pages/credit/new_credit_page.dart';
+import 'package:paycapp/src/pages/download_example.page.dart';
+import 'package:paycapp/src/pages/download_page.dart';
 import 'package:paycapp/src/pages/expense/add_expense_page.dart';
 import 'package:paycapp/src/pages/home_page.dart';
 import 'package:paycapp/src/pages/login_page.dart';
@@ -19,6 +21,7 @@ Map<String, WidgetBuilder> getAppRoutes() {
     'credit_calc': (BuildContext context) => CalcCreditPage(),    
     'map': (BuildContext context) => MapPage(),
     'expense_add': (BuildContext context) => AddExpensePage(),
+    'download': (BuildContext context) => DownloadPage(),
   };
 
 }

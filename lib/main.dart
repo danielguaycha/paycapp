@@ -1,6 +1,12 @@
+  
+
+import 'dart:ui';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'package:easy_alert/easy_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:paycapp/src/brain.dart';
@@ -17,22 +23,24 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux_logging/redux_logging.dart';
+
 //import 'package:laravel_echo/laravel_echo.dart';
 //import 'package:flutter_pusher_client/flutter_pusher.dart';
 
 GetIt locator = GetIt.instance;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize(debug: true);
+
   final store = Store<AppState>(
       reducer,
       initialState: new AppState(user: null),
-      middleware: [thunkMiddleware, new LoggingMiddleware.printer()],
-      //middleware: [thunkMiddleware]
-  );
-  WidgetsFlutterBinding.ensureInitialized();
+      middleware: [thunkMiddleware, new LoggingMiddleware.printer()],    
+  );  
 
   await LocalStorage().initPrefs();
-  locator.registerLazySingleton(() => NavigationService());
+  locator.registerLazySingleton(() => NavigationService());  
 
   runApp(
       StoreProvider(store: store, child: new AlertProvider(
@@ -56,9 +64,17 @@ class _MyAppState extends State<MyApp> {
   void initState() {    
     _initUser();
     _subscribe();
+    _checkPermission();    
     super.initState();
   }
 
+  Future<bool> _checkPermission() async {
+    if(await Permission.storage.isDenied) {
+      await Permission.storage.request();
+    }        
+    return false;
+  }
+  
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -132,5 +148,5 @@ class _MyAppState extends State<MyApp> {
       }); */
       //echo.socket.on('connect', (_) => print('connect'));
       //echo.socket.on('disconnect', (_) => print('disconnect')); 
-  }
+  }      
 }

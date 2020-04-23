@@ -87,7 +87,7 @@ class _NewCreditPageState extends State<NewCreditPage> {
       if (isOk == 1) {
         return;
       }   
-      _loader.show(msg: "Procesando crédito, espere");
+      _loader.show(msg: "Procesando crédito, espere...\n\nSi ha proporcionado una referencia & prenda, es probable que tome algo de tiempo");
 
     if (_geoloc) {
       final loc = await Geolocator()

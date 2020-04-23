@@ -51,6 +51,9 @@ dependencies:
   # cupertino_icons: ^0.1.2
   flutter_pusher_client:
   laravel_echo: 
+  flutter_downloader:
+  install_plugin:
+  permission_handler: 
   flutter_localizations:
     sdk: flutter
 
