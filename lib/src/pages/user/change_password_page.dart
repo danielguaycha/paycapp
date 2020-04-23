@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/providers/auth_provider.dart';
+import 'package:paycapp/src/utils/messages_util.dart';
 import '../../config.dart';
+
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -22,18 +24,26 @@ bool newpassValidate = false;
 bool passLenght = false;
 String oldPass = "";
 String newPass = "";
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 class _ChangePasswordState extends State<ChangePassword> {
+  final _myControllerOldPass = TextEditingController();
+  final _myControllerNewPass = TextEditingController();
+  final _myControllerNewPassToo = TextEditingController();
+
   @override
-  void initState() { 
+  void initState() {
     newpassValidate = false;
     passLenght = false;
     newPass = "";
     oldPass = "";
-    super.initState();    
+    super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(title: Text("Configuraciones")),
       body: SingleChildScrollView(
         child: Padding(
@@ -54,7 +64,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                       style: newpassValidate ? goodStyle : badStyle),
                 ],
               )),
-
               Divider(),
               _oldPpassword(),
               Divider(),
@@ -63,7 +72,9 @@ class _ChangePasswordState extends State<ChangePassword> {
               _repeatNewPassword(),
               Divider(),
               _botton("Cambiar Contraseña", _back),
-              
+              _botton("Salir", () {
+                Navigator.pop(context);
+              }),
             ],
           ),
         ),
@@ -111,6 +122,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget _oldPpassword() {
     return TextFormField(
       obscureText: true,
+      controller: _myControllerOldPass,
       decoration: const InputDecoration(
         labelText: 'Clave actual',
       ),
@@ -127,6 +139,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget _newPassword() {
     return TextFormField(
       obscureText: true,
+      controller: _myControllerNewPass,
       decoration: const InputDecoration(
         labelText: 'Clave nueva',
       ),
@@ -147,6 +160,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget _repeatNewPassword() {
     return TextFormField(
       obscureText: true,
+      controller: _myControllerNewPassToo,
       decoration: const InputDecoration(
         labelText: 'Confirmar nueva clave',
       ),
@@ -156,23 +170,42 @@ class _ChangePasswordState extends State<ChangePassword> {
         }
         return "";
       },
-      onChanged: (v){
-        print("$v == $newPass"); 
+      onChanged: (v) {
+        print("$v == $newPass");
         (v == newPass) ? newpassValidate = true : newpassValidate = false;
-        (v.length >=4) ? passLenght = true : passLenght = false;
+        (v.length >= 4) ? passLenght = true : passLenght = false;
         _retry();
       },
     );
   }
-  void _retry(){
+
+  void _retry() {
     setState(() {});
   }
 
   Future<bool> _back() async {
+    //Para bajar el teclado
     FocusScope.of(context).requestFocus(new FocusNode());
-    
-    Responser res = await AuthProvider().changePassword(oldPass, newPass);
-
-    Navigator.pop(context);
+    //Verificar campos validos
+    if (passLenght && newpassValidate) {
+      Responser res = await AuthProvider().changePassword(oldPass, newPass);
+      if (res.ok) {
+        _myControllerOldPass.text =  _myControllerNewPass.text = _myControllerNewPassToo.text =  "";
+        passLenght = newpassValidate = false;
+        oldPass = newPass = "";
+        _scaffoldKey.currentState.showSnackBar(customSnack("Clave cambiada"));
+      
+      } else {
+        _myControllerOldPass.text =  _myControllerNewPass.text = _myControllerNewPassToo.text =  "";
+        passLenght = newpassValidate = false;
+        oldPass = newPass = "";
+        _scaffoldKey.currentState.showSnackBar(customSnack(res.message, type: 'err'));
+        _retry();
+            // Navigator.pop(context);
+      }
+    } else {
+      _scaffoldKey.currentState.showSnackBar(
+          customSnack("Campos invalidos", type: 'err', seconds: 2));
+    }
   }
 }

@@ -82,6 +82,7 @@ class CreditProvider {
   
   //Listar pagos por dia
   Future<dynamic> listPaymentsForDay(String date) async {
+    print("Peticion");
     String url = "/payment?&date="+date;
     Response res = await _http.get(url);
     return Responser.fromJson(res.data);
@@ -117,22 +118,23 @@ class CreditProvider {
     return ShowCredit.fromJson(json.encode(res.data['data']));    
   }
 
-  //Nuevo provider 31/03/2020
-  Future<List<CreditNew>> getlist({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null"}) async {
+  // //Nuevo provider 31/03/2020
+  // Future<List<CreditNew>> getlist({int page: 1, String ruta: "null", String plazo: "null", String cobros: "null"}) async {
 
-    String url = "/credit?page=$page";
+  //   String url = "/credit?page=$page";
     
-    url = (ruta !="null") ? url + "&ruta=$ruta" : url;
-    url = (plazo !="null") ? url + "&plazo=$plazo" : url;
-    url = (cobros !="null") ? url + "&cobro=$cobros" : url;
+  //   url = (ruta !="null") ? url + "&ruta=$ruta" : url;
+  //   url = (plazo !="null") ? url + "&plazo=$plazo" : url;
+  //   url = (cobros !="null") ? url + "&cobro=$cobros" : url;
 
-    final resp = await _http.get(url);
-    //TODO: Esta variable para que se la usa ?
-    final decodedData = json.decode(resp.data.toString());
+  //   final resp = await _http.get(url);
+  //   //TODO: Esta variable para que se la usa ?
+       //TODO: No se la usa para nada, ni al metodo. Fue un experimento sin resultados positivos
+  //   final decodedData = json.decode(resp.data.toString());
 
-    Response res = await _http.get(url);
-    //return Responser.fromJson(res.data);
+  //   Response res = await _http.get(url);
+  //   //return Responser.fromJson(res.data);
 
-    return [];
-    }
+  //   return [];
+  //   }
 }

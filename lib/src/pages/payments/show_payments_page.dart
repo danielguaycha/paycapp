@@ -7,6 +7,7 @@ import 'package:paycapp/src/config.dart';
 import 'package:paycapp/src/models/clientCredit_model.dart';
 import 'package:paycapp/src/models/ruta_model.dart';
 import 'package:paycapp/src/pages/payments/payments_widgets.dart';
+import 'package:paycapp/src/pages/payments/test.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
 import 'package:paycapp/src/providers/route_provider.dart';
 import 'package:paycapp/src/utils/utils.dart';
@@ -69,24 +70,12 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
               await _selecionarFecha(context);
             },
           ),
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return choicesForPyments.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(
-                    choice.toUpperCase(),
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                );
-              }).toList();
-            },
-          ),
         ],
       ),
       body: Column(
         children: <Widget>[
+          Expanded( child: _listBoton(),),
+
           //  Expanded(
           //    flex: 1,
           //               child:
@@ -120,7 +109,8 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
 
           Expanded(
             flex: 6,
-            child: _futureBuilderPyments(context, _scaffoldKey),
+            child: 
+            _futureBuilderPyments(context, _scaffoldKey),
           )
         ],
       ),
@@ -164,7 +154,9 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
   Widget _futureBuilderPyments(context, _scaffoldKey) {
     return FutureBuilder(
       //lista del servidor
-      future: _paymentsClients.length <= 0 ? CreditProvider().listPaymentsForDay(_fecha) : null,
+      future: _paymentsClients.length <= 0
+          ? CreditProvider().listPaymentsForDay(_fecha)
+          : null,
 
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -179,16 +171,23 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
         if (results != null && results.length <= 0) {
           return renderNotFoundData("No tienes rutas asignadas aún");
         }
+
+        if (results[category].length <= 0) {
+          return renderNotFoundData("No hay datos en esta categoria");
+        }
+
         print("DATA: ${results[category].length}");
 
-            _paymentsClients.clear();
+        _paymentsClients.clear();
 
-        choicesForPyments.map((String choice) {
-          _loadResultsToList(results[choice]);
-        }).toList();
+        _loadResultsToList(results[category]);
+        // choicesForPyments.map((String choice) {
+        //   _loadResultsToList(results[choice]);
+        // }).toList();
 
-          print("ELEMENTO: ${_paymentsClients.length}");
+        print("ELEMENTO: ${_paymentsClients.length}");
         
+        // return TestPage(data: _paymentsClients,);
         return Row(
           children: <Widget>[_lista(results[category], context, _scaffoldKey)],
         );
@@ -200,18 +199,20 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     for (int i = 0; i < results.length; i++) {
       var payment = results[i];
       _paymentsClients.add(new DataClient(
-          payment['lat'].toString(),
-          payment['lon'].toString(),
-          "${payment['client_name']}  ${payment['client_surname']} ",
-          payment['address'],
-          totalPago: payment['total'],
-          cobro: payment['cobro'],
-          status: payment['status'],
-          idPayment: payment['id'],
-          idCredit: payment['credit_id'],
-          ref_detail: payment['ref_detail'],
-          ref_img: payment['ref_img'],
-          payment: true,));
+        payment['lat'].toString(),
+        payment['lon'].toString(),
+        "${payment['client_name']}  ${payment['client_surname']} ",
+        payment['address'],
+        totalPago: payment['total'],
+        cobro: payment['cobro'],
+        status: payment['status'],
+        idPayment: payment['id'],
+        idCredit: payment['credit_id'],
+        ref_detail: payment['ref_detail'],
+        ref_img: payment['ref_img'],
+        isDataPayment: true,
+        numeroPago: payment['number']
+      ));
     }
   }
 
@@ -223,6 +224,8 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
       );
     }
 
+    // return null;
+
     return Expanded(
         child: ListView.builder(
             scrollDirection: Axis.vertical,
@@ -231,7 +234,7 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
               var payment = results[index];
 
               return slideableForPyments(
-                  // dataCliente: _paymentsClients[index], 
+                  // dataCliente: _paymentsClients[index],
                   dataCliente: new DataClient(
                     payment['lat'].toString(),
                     payment['lon'].toString(),
@@ -244,12 +247,14 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
                     ref_detail: payment['ref_detail'],
                     ref_img: payment['ref_img'],
                     cobro: payment['cobro'],
+                    numeroPago: payment['number'], 
                   ),
                   retry: _retry,
                   context: context,
                   scaffoldKey: scaffoldKey,
                   showDetail: true);
-            }));
+            })
+            );
   }
 
   String _getStatus(int status) {
@@ -296,9 +301,20 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
     }
   }
 
-  Widget _boxRoute({String contenido: ''}) {
-    return Container(
-      // color: colors['aaccent'],
+  Widget _listBoton() {
+    return ListView.builder(
+
+        scrollDirection: Axis.horizontal,
+        itemCount: choicesForPyments.length,
+        itemBuilder: (BuildContext context, int index) {
+          return _boxRoute(contenido: choicesForPyments[index].toUpperCase(), position: index );
+        });
+  }
+
+  Widget _boxRoute({String contenido: '', int position = 0}) {
+    return AnimatedContainer(
+      height: 0.0,
+      duration: Duration(seconds: 3),
       margin: EdgeInsets.all(10),
       child: RaisedButton(
         color: colors['accent'],
@@ -306,9 +322,16 @@ class _ShowPaymentsPageState extends State<ShowPaymentsPage> {
           "$contenido",
           style: TextStyle(color: Colors.white),
         ),
-        onPressed: () {},
+        onPressed: () {
+          _mostrarTipo(position);
+        },
       ),
     );
+  }
+
+  void _mostrarTipo(int position){
+    category = choicesForPyments[position];
+    _retry();
   }
 
   _retry() {

@@ -40,19 +40,19 @@ Widget slideableForPyments({
   dataClient = dataCliente;
   _loader = new ProgressLoader(context);
   _scaffoldKey = scaffoldKey;
-  Color _color = Colors.black54;
+  Color _color = Colors.black;
   String _state = "Pendiente";
   if (dataClient.status == TYPE_MORA) {
     _color = Colors.red;
     _state = "En mora";
   } else if (dataClient.status == TYPE_PAGADO) {
     _color = Colors.green;
-    _state = "Pagado";
+    _state = "Cobrado";
   }
 
-  double fontWeit = 20.0;
-  if ("${dataClient.name}".length > 25) fontWeit = 18.0;
-  if ("${dataClient.name}".length > 30) fontWeit = 17.0;
+  double fontWeit = 18.0;
+  if ("${dataClient.name}".length > 25) fontWeit = 16.0;
+  if ("${dataClient.name}".length > 30) fontWeit = 15.0;
 
   return Slidable(
     actionPane: SlidableDrawerActionPane(),
@@ -90,47 +90,51 @@ Widget slideableForPyments({
                           style: TextStyle(
                               fontSize: fontWeit,
                               color: _color,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.w600
+                              ),
                         ),
-                        // Text(
-                        //   "$addres",
-                        //   textAlign: TextAlign.left,
-                        //   style: TextStyle(fontSize: fontWeit, color: _color),
-                        // ),
+                        Text(
+                      money(dataClient.totalPago),
+                      textAlign: TextAlign.right,
+                      style: TextStyle(color: _color),
+                    ),
                       ],
                     )
             ],
           )),
-          !showDetail
-              ? Column(
+          // !showDetail
+          //     ? Column(
+
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: <Widget>[
+          //           Text(
+          //             "$_state",
+          //             // textAlign: TextAlign.right,
+          //             style: TextStyle(
+          //                 fontSize: 17,
+          //                 fontWeight: FontWeight.bold,
+          //                 color: _color),
+          //           ),
+          //         ],
+          //       )
+          //     : 
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
+                    Text(
+                      "Pago #${dataCliente.numeroPago}",
+                      // textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: _color),
+                    ),
                     Text(
                       "$_state",
                       textAlign: TextAlign.right,
                       style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: _color),
-                    ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      money(dataClient.totalPago),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: _color),
-                    ),
-                    Text(
-                      "$_state",
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: _color),
                     ),
                   ],
