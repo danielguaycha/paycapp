@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paycapp/env.dart' show server;
 
+const buildVersion = 1.0; // incrementar segun la actualización en el server
 const appName = "PayApp";
 const urlApi = "http://$server/api";
 const debug = true;

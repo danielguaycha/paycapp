@@ -33,28 +33,6 @@ Widget errMessage({String msg: ''}) {
   );
 }
 
-Widget textOrLoader({bool loader: false, String loaderText: 'Procesando...', String text: 'Button'}) {
-  if(loader) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(
-            strokeWidth: 2.0,      
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          ),
-        ),        
-        SizedBox(width: 10),
-        Text(loaderText),        
-      ],
-    );
-  }
-  return Text(text, style: TextStyle(color: Colors.white));
-}
-
 Widget customSnack(String message, {String type: 'ok', SnackBarAction action, int seconds = 4}) {
   SnackBar snack;
   switch(type.toLowerCase()){

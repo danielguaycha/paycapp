@@ -10,6 +10,7 @@ import 'package:paycapp/src/models/clientCredit_model.dart';
 import 'package:paycapp/src/models/responser.dart';
 import 'package:paycapp/src/pages/payments/list_payments_page.dart';
 import 'package:paycapp/src/providers/credit_provider.dart';
+import 'package:paycapp/src/providers/route_provider.dart';
 import 'package:paycapp/src/utils/messages_util.dart';
 import 'package:paycapp/src/utils/progress_loader.dart';
 import 'package:paycapp/src/utils/utils.dart'
@@ -36,10 +37,10 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
   List<DataClient> _listClients = new List<DataClient>();
   ProgressLoader _loader;
   bool _actualizar = true;
-  bool _addPadding = false;
 
   @override
   void initState() {    
+    _loadZones();
     _controller = AnimationController(
         vsync: this, duration: Duration(milliseconds: 100), value: 1.0);    
     super.initState();
@@ -257,7 +258,7 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     'DOS_MESES': 'Dos meses',
     'null': 'Todos',
   };
-
+  List<Zone> _zonesList = new List();
   String _valorPlazo = "null";
   String _valorCobro = "null";
   int _valorRuta = 0;
@@ -443,60 +444,49 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
     //*=== Zonas ===
 
   Widget _zones () {
-    return StoreConnector<AppState, dynamic>(
-        onInit: (store) => {
-
-        },  
-        converter: (store) => store.state.user,
-        builder: (context, user) { 
-          if(user.zones == null) {
-            return Center(child: Text("No hay rutas disponibles", style: TextStyle(color: Colors.red)));
-          }
-          return DropdownButtonFormField(          
-            value: _valorRuta,
-            decoration: InputDecoration(
-              labelText: "Filtrar por Rutas",
-              labelStyle:
-                  TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-              fillColor: Colors.white,
-              icon: Icon(
-                FontAwesomeIcons.route,
-                color: Colors.white54,
-              ),
-            ),                             
-            onChanged: (v) {                     
-              setState(() {
-                _valorRuta = v;
-              });
-            },          
-            items: _renderZones(user.zones),
-          );
-        },
-    );
+    return DropdownButtonFormField(          
+      value: _valorRuta,
+      itemHeight: 80,
+      isDense: true,                    
+      decoration: InputDecoration(
+          icon: Icon(FontAwesomeIcons.route, color: Colors.white54,), 
+          labelText: 'Zona/Ruta',
+          labelStyle:
+              TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+          fillColor: Colors.white,
+      ),
+      onChanged: (v) {                     
+        setState(() {
+          _valorRuta = v;
+        });
+      },          
+      items: _renderZones(),
+    );    
   }
 
-  List _renderZones (List<Zone> zones) {
-    List<DropdownMenuItem<int>> lista = new List();
-    
-    zones.forEach((z) {
-      lista
-      ..add(DropdownMenuItem(
-        child: Text('${z.name}', style: TextStyle(
-              color: Colors.orange,
-            ),),
-        
-        value: z.id,
-      ));
-    });
-    lista.add(DropdownMenuItem(
+  List _renderZones () {
+    List<DropdownMenuItem<int>> lista = new List();   
+
+     lista.add(DropdownMenuItem(
       child: Text("Todas", style: TextStyle(
               color: Colors.orange,
             ),),
       value: 0,
     ));
+    if(_zonesList != null && _zonesList.length > 0) {
+      _zonesList.forEach((z) {
+        lista
+        ..add(DropdownMenuItem(
+          child: Text('${z.name}', style: TextStyle(color: Colors.orange,),),
+          value: z.id,
+        ));
+      });
+    } 
+
+   
+    
     return lista;
   }
-
   // Render Lists
   List<DropdownMenuItem<dynamic>> listItems(Map<dynamic, String> map) {
     List<DropdownMenuItem<dynamic>> lista = new List();
@@ -580,4 +570,14 @@ class _ListCreditPageState extends State<ListCreditPage> with SingleTickerProvid
           );
         });
   }
+
+  _loadZones() async {    
+    Responser res = await RouteProvider().getRoutes();
+    if(res.ok) {
+      for(var i=0; i<res.data.length; i++) {        
+        _zonesList.add(Zone.fromMap(res.data[i]));
+      }
+    }   
+  }
+
 }
