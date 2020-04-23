@@ -10,7 +10,7 @@ class DataClient {
   // Para pagos
   int idPayment;
   int idCredit;
-  bool payment;
+  bool isDataPayment;
   String cobro;
   int status;
   String ref_detail;
@@ -27,7 +27,7 @@ class DataClient {
   DataClient(String lat, String lng, String name, String address,
       {String zone,
       double distancia,
-      bool payment,
+      bool isDataPayment,
       String cobro,
       int status,
       int idPayment,
@@ -45,7 +45,7 @@ class DataClient {
     this.address = address;
     this.zone = zone;
     this.distancia = distancia;
-    this.payment = payment;
+    this.isDataPayment = isDataPayment;
     this.distancia = distancia;
     this.cobro = cobro;
     this.status = status;

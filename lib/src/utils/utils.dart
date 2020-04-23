@@ -9,9 +9,10 @@ import 'package:paycapp/src/config.dart' show urlApi;
 import 'package:paycapp/src/config.dart' show debug;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
-import 'package:flutter_advanced_networkimage/transition.dart';
-import 'package:flutter_advanced_networkimage/zoomable.dart';
+
+// import 'package:flutter_advanced_networkimage/provider.dart';
+// import 'package:flutter_advanced_networkimage/transition.dart';
+// import 'package:flutter_advanced_networkimage/zoomable.dart';
 
 // Loader Component
 Widget loader({String text = 'Cargando...'}) {
@@ -294,32 +295,41 @@ bool isNumeric(String s) {
 }
 
 Widget showImage(String urlImagen) {
-  bool _imageError = false;
-  return ZoomableWidget(
-    minScale: 0.3,
-    maxScale: 3.0,
-    // default factor is 1.0, use 0.0 to disable boundary
-    // panLimit: 0.5,
-    child: Container(
-      // width: double.minPositive,
-      // height: double.minPositive,
-      margin: EdgeInsets.all(0.0),
-      child: TransitionToImage(
-        image: AdvancedNetworkImage(getImagen(urlImagen),
-            timeoutDuration: Duration(seconds: 5)),
-        // This is the default placeholder widget at loading status,
-        // you can write your own widget with CustomPainter.
-        placeholder: _imageError ? Icon(Icons.message) : CircularProgressIndicator(),
-        // This is default duration
-        duration: Duration(milliseconds: 300),
-      ),
-    ),
+  return FadeInImage.assetNetwork(
+    fadeInCurve: Curves.decelerate,
+    image: getImagen(urlImagen),
+    placeholder: 'assets/img/load.gif',
   );
-  // return FadeInImage.assetNetwork(
-  //   fadeInCurve: Curves.decelerate,
-  //   image: getImagen(urlImagen),
-  //   placeholder: 'assets/img/load.gif',
+    // ZoomableImage(
+    
+  //   new NetworkImage(getImagen(urlImagen),
+
+  //   ),
+
   // );
+
+  // bool _imageError = false;
+  // return ZoomableWidget(
+  //   minScale: 0.3,
+  //   maxScale: 3.0,
+  //   // default factor is 1.0, use 0.0 to disable boundary
+  //   // panLimit: 0.5,
+  //   child: Container(
+  //     // width: double.minPositive,
+  //     // height: double.minPositive,
+  //     margin: EdgeInsets.all(0.0),
+  //     child: TransitionToImage(
+  //       image: AdvancedNetworkImage(getImagen(urlImagen),
+  //           timeoutDuration: Duration(seconds: 5)),
+  //       // This is the default placeholder widget at loading status,
+  //       // you can write your own widget with CustomPainter.
+  //       placeholder: _imageError ? Icon(Icons.message) : CircularProgressIndicator(),
+  //       // This is default duration
+  //       duration: Duration(milliseconds: 300),
+  //     ),
+  //   ),
+  // );
+
 }
 
 //* Comprimidor de imagenes

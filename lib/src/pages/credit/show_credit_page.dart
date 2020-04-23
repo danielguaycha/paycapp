@@ -200,7 +200,11 @@ class _ShowCreditPageState extends State<ShowCreditPage> {
 
     return ListTile(
       contentPadding: EdgeInsets.all(0),
-      leading: showImage(_credit.refImg),
+      leading: Container(
+        width: 50.0,
+        height: 50.0,
+        child: showImage(_credit.refImg)
+      ),
       title: Text("${(_credit.refDetail != null ? _credit.refDetail : 'Ninguna')}"),
       subtitle: Text("Referencia"),
       onTap: () {
@@ -214,7 +218,11 @@ class _ShowCreditPageState extends State<ShowCreditPage> {
     if(_credit.prenda != null && _credit.prenda.length > 0){
       return ListTile(
         contentPadding: EdgeInsets.all(0),
-        leading: showImage(_credit.prenda[0].img),
+        leading: Container(
+          width: 50.0,
+          height: 50.0,
+          child: showImage(_credit.prenda[0].img),
+        ),
         title: Text("${_credit.prenda[0].detail}"),
         subtitle: Text("Prenda"),
         onTap: () {
